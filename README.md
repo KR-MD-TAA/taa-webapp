@@ -29,11 +29,16 @@ https://KR-MD-TAA.github.io/taa-webapp
 
 > 이 대시보드는 연구 결과의 시각화용이며 금융상품 추천이나 투자자문을 제공하지 않습니다.
 
+
 License
 © 2026 Beomseok Seo
-This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) License.
-Free for noncommercial research and educational use.
-Attribution is required.
-Commercial use requires prior written permission.
-Third-party datasets and software remain subject to their respective licenses.
-For details, see LICENSE or the CC BY-NC 4.0 License.
+This project is made available under the PolyForm Noncommercial License 1.0.0.
+The license applies to the original source code and software components of this repository, including the web application and its associated implementation files.
+Noncommercial research and educational use is permitted.
+Noncommercial modification and redistribution are permitted, subject to the license terms.
+Commercial use requires separate written permission from the copyright holder.
+Original documentation, research outputs, and datasets are subject to any separately stated usage terms.
+Third-party software and externally sourced datasets remain subject to their respective licenses and terms of use.
+For details, see LICENSE or the PolyForm Noncommercial License 1.0.0.
+For commercial licensing inquiries, please contact the copyright holder.
+
