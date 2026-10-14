@@ -1,4 +1,33 @@
-<div class="method-v2"><div class="method-v2-hero"><div class="method-v2-eyebrow">FINAL RESEARCH REPORT · OCT 2026</div><h2>Methodology · KR-MD &amp; Regime-Based TAA</h2><p>KR-MD 구축 → 거시경제 국면식별 → 국면별 수익률 예측 → 자산배분 → 성과평가</p></div><div class="method-v2-nav"><a href="#method-krmd">01 · KR-MD</a><a href="#method-regime">02 · Regime Identification</a><a href="#method-taa">03 · TAA Models</a><a href="#method-constraints">04 · Constraints</a><a href="#method-performance">05 · Performance</a></div><section class="method-v2-section" id="method-krmd">
+<style>
+/* Scoped to methodology component; compatible with the existing dark/light theme. */
+.method-v2 .method-v2-bullets {margin:12px 0 18px;padding:0;list-style:none;display:grid;gap:7px;}
+.method-v2 .method-v2-bullets li {position:relative;padding-left:17px;line-height:1.65;word-break:keep-all;overflow-wrap:break-word;}
+.method-v2 .method-v2-bullets li::before {content:"•";position:absolute;left:0;top:0;color:#68b2ff;font-weight:700;}
+.method-v2 .method-v2-bullets.compact {margin:8px 0 10px;gap:5px;}
+.method-v2 .method-v2-bullets.compact li {font-size:.94em;line-height:1.5;}
+.method-v2 .method-v2-flow-scroll {width:100%;overflow-x:auto;padding:6px 1px 14px;scrollbar-width:thin;}
+.method-v2 .method-v2-flow {display:grid;grid-template-columns:minmax(158px,1fr) 22px minmax(170px,1fr) 22px minmax(205px,1.2fr) 22px minmax(150px,.94fr);align-items:stretch;gap:8px;min-width:780px;}
+.method-v2 .method-v2-flow-cell {min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:7px;padding:17px 11px 15px;border:1px solid rgba(130,163,203,.27);border-radius:12px;background:rgba(105,143,185,.075);text-align:center;box-sizing:border-box;}
+.method-v2 .method-v2-flow-index {font-size:.69rem;letter-spacing:.08em;opacity:.68;line-height:1;}
+.method-v2 .method-v2-flow-title {font-weight:750;font-size:.98rem;line-height:1.4;}
+.method-v2 .method-v2-flow-detail {font-size:.8rem;line-height:1.48;opacity:.82;word-break:keep-all;}
+.method-v2 .method-v2-flow-arrow {font-size:23px;line-height:1;align-self:center;justify-self:center;color:#68b2ff;}
+.method-v2 .method-v2-flow-math {margin-top:auto;padding-top:8px;width:100%;border-top:1px solid rgba(130,163,203,.22);font-size:.83em;overflow-x:auto;}
+.method-v2 .method-v2-flow-math mjx-container {margin:5px 0 0!important;}
+.method-v2 .method-v2-note-tight {margin-top:6px!important;line-height:1.6;}
+.method-v2 .method-v2-equation .method-v2-math {overflow-x:auto;overflow-y:hidden;}
+.method-v2 .method-v2-model-card {margin-top:12px;margin-bottom:12px;}
+.method-v2 .method-v2-model-card .method-v2-description {line-height:1.65;}
+.method-v2 .method-v2-model-card .method-v2-description b {font-weight:700;}
+.method-v2 .method-v2-intro-tight {margin-bottom:9px!important;}
+.method-v2 .method-v2-table-wrap {overflow-x:auto;}
+@media (max-width:650px) {
+  .method-v2 .method-v2-flow {min-width:740px;}
+  .method-v2 .method-v2-flow-cell {padding:13px 9px;}
+  .method-v2 .method-v2-flow-scroll {scroll-snap-type:x proximity;}
+  .method-v2 .method-v2-flow-cell {scroll-snap-align:start;}
+}
+</style><div class="method-v2"><div class="method-v2-hero"><div class="method-v2-eyebrow">FINAL RESEARCH REPORT · OCT 2026</div><h2>Methodology · KR-MD &amp; Regime-Based TAA</h2><p>KR-MD 구축 → 거시경제 국면식별 → 국면별 수익률 예측 → 자산배분 → 성과평가</p></div><div class="method-v2-nav"><a href="#method-krmd">01 · KR-MD</a><a href="#method-regime">02 · Regime Identification</a><a href="#method-taa">03 · TAA Models</a><a href="#method-constraints">04 · Constraints</a><a href="#method-performance">05 · Performance</a></div><section class="method-v2-section" id="method-krmd">
 <div class="method-v2-section-head"><div class="method-v2-number">01</div><div><h3 class="method-v2-title">KR-MD Construction &amp; Preprocessing</h3><p class="method-v2-kicker">자료 구축 · 변수 변환 및 순환변동치 · 월별 보간 · 표준화</p></div></div>
 <ul class="method-v2-bullets">
 <li>FRED-MD/QD의 분류체계를 참고하여 <strong>13개 부문, 204개 변수</strong> 구축(월별 146개, 분기별 58개)</li>
