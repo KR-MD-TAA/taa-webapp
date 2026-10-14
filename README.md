@@ -28,3 +28,13 @@ https://KR-MD-TAA.github.io/taa-webapp
 - **Python 코드를 웹상에서 재실행하지 않습니다.** 국면 분류(PCA/Clustering), 최적화, Black-Litterman, Ridge 등은 원본 프로젝트의 이미 계산된 출력값을 표시합니다. 새로운 원천 데이터를 반영하려면 웹에 게시할 정적 데이터 스냅샷을 다시 생성해야 합니다.
 
 > 이 대시보드는 연구 결과의 시각화용이며 금융상품 추천이나 투자자문을 제공하지 않습니다.
+
+License
+© 2026 Beomseok Seo
+This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) License.
+Free for noncommercial research and educational use.
+Attribution is required.
+Commercial use requires prior written permission.
+Third-party datasets and software remain subject to their respective licenses.
+
+For details, see LICENSE or the CC BY-NC 4.0 License.
