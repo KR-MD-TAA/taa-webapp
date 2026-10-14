@@ -36,5 +36,4 @@ Free for noncommercial research and educational use.
 Attribution is required.
 Commercial use requires prior written permission.
 Third-party datasets and software remain subject to their respective licenses.
-
 For details, see LICENSE or the CC BY-NC 4.0 License.
