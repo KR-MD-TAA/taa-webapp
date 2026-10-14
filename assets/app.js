@@ -108,6 +108,39 @@ function matchedProb(mode,probs){
  return p;
 }
 function monthlyIndexForVar(varid){return state.cycleByVar[varid]}
+
+// Plotly.react is asynchronous. Rapid range input events previously started multiple
+// 175-ms transitions on the same plot, allowing an older axis window to appear after
+// a newer vintage had already been selected. Serialize plot updates and keep only
+// the most recently requested vintage while one is being rendered.
+let pendingOverviewPlot = null;
+let renderingOverviewPlot = false;
+function queueOverviewPlot(traces, layout, options){
+ pendingOverviewPlot = {traces,layout,options};
+ if(renderingOverviewPlot)return;
+ renderingOverviewPlot = true;
+ (async () => {
+  try{
+   while(pendingOverviewPlot){
+    const next = pendingOverviewPlot;
+    pendingOverviewPlot = null;
+    await plot('ov-main', next.traces, next.layout, next.options);
+    // Do not let an interrupted transition, previous zoom, or autorange
+    // override the exact 5-years-before / 15-months-after selection.
+    if(!pendingOverviewPlot && $('ov-main')?.layout){
+     await Plotly.relayout($('ov-main'), {
+      'xaxis.autorange': false,
+      'xaxis.range': [...next.layout.xaxis.range]
+     });
+    }
+   }
+  }catch(error){showError(error)}
+  finally{
+   renderingOverviewPlot = false;
+   if(pendingOverviewPlot)queueOverviewPlot(pendingOverviewPlot.traces,pendingOverviewPlot.layout,pendingOverviewPlot.options);
+  }
+ })();
+}
 function updateOverview(){
  const d=state.data;if(!d)return;
  const vintages=d.regimes.modes.global.rt.filter(x=>x.date>='2001-01');
@@ -129,10 +162,10 @@ function updateOverview(){
  shapes.push({type:'line',xref:'x',yref:'paper',x0:monthDate(cut),x1:monthDate(cut),y0:0,y1:1,line:{color:INK,width:2}});
  const yy=historyY.concat(futureY);let lo=-0.04,hi=0.04;if(yy.length){lo=Math.min(lo,...yy);hi=Math.max(hi,...yy);if(lo<-.04||hi>.04){let pad=(hi-lo)*0.05;lo-=pad;hi+=pad}}
  const name=d.cycles.major[$('ov-var').value]||$('ov-var').value;
- plot('ov-main',[
+ queueOverviewPlot([
   {type:'scatter',mode:'lines',x:historyX,y:historyY,name:name,line:{color:PURPLE,width:2.6}},
   {type:'scatter',mode:'lines',x:futureX,y:futureY,name:'선택 vintage 이후 실제값',line:{color:'#CBD5E1',width:2,dash:'dash'}}
- ],{shapes,xaxis:{type:'date',range:[monthDate(first),monthDate(last)]},yaxis:{title:'Cycle',range:[lo,hi],autorange:false},annotations:[{x:monthDate(cut),y:0.04,yref:'paper',text:'Vintage '+clean(cut),showarrow:false,xanchor:'right',font:{size:10,color:INK},bgcolor:'rgba(18,24,38,.90)'}]}, {title:name+' · 5-year rolling vintage view',height:520});
+ ],{shapes,xaxis:{type:'date',range:[monthDate(first),monthDate(last)],autorange:false},yaxis:{title:'Cycle',range:[lo,hi],autorange:false},annotations:[{x:monthDate(cut),y:0.04,yref:'paper',text:'Vintage '+clean(cut),showarrow:false,xanchor:'right',font:{size:10,color:INK},bgcolor:'rgba(18,24,38,.90)'}]}, {title:name+' · 5-year rolling vintage view',height:520,transition:0});
  const regime=selectedRegime('global',cut);
  $('ov-regime').innerHTML='<h3>Vintage &amp; regime</h3>'+sideRow('선택 Vintage',cut)+sideRow('선택 월 Regime',`R${regime} · ${NAMES[regime]}`,COLORS[regime])+sideRow('최근 3개월','신규 관측치에 따라 수정 가능');
  const method=$('ov-method').value,key=`qoq_global|class_eq_constrained|${method}`,w=d.taa.portfolios[key];

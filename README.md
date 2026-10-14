@@ -53,6 +53,12 @@ methodology.html          Original 5 methodology sections and equations
 
 These JSON files are a **snapshot of the provided final data**, pre-exported during conversion. Adding future data requires updating the corresponding JSON; there is no server-side computation on a visitor's browser. TAA optimization and PCA / clustering are not re-estimated: their supplied final results are displayed as in the source dashboard.
 
+## Vintage slider window fix (2026-10-14)
+
+- The Overview plot is explicitly fixed to **selected vintage − 60 months** through **selected vintage + 15 months** (61 historical monthly regime slots and an unshaded future-data section).
+- Plotly updates are serialized and rapid slider events are coalesced, so older transitions cannot replace a newer selection.
+- The Overview plot disables Plotly's animated transition, and explicitly reapplies its X-axis range after render. Other tabs and datasets are unchanged.
+
 ## Data checks / methodological details
 
 - Each Overview monthly regime history is read from the **vintage-specific** column of `revised_regimes`, not from the latest final series. The selected month is the last historical month with a regime background, and the future shaded region is independent of regime prediction.
