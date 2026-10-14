@@ -1,0 +1,252 @@
+:root {
+  --accent:#8B5CF6; --accent-dark:#7C3AED; --accent-mid:#A78BFA; --accent-light:#C4B5FD; --accent-pale:#24163D;
+  --bg:#081120; --topbar:#0B1424; --panel:#0F172A; --panel-2:#111C34;
+  --ink:#F8FAFC; --muted:#94A3B8; --line:#23324A; --line-2:#334155; --track:#1E293B;
+}
+*{box-sizing:border-box}
+html,body,#react-entry-point,#_dash-app-content{margin:0;min-height:100%;background:var(--bg);color:var(--ink)}
+body{font-family:Inter,Pretendard,"Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px}
+.topbar{min-height:86px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:1px solid var(--line);background:var(--topbar)}
+.brand-wrap{display:flex;align-items:center;gap:16px;min-width:0}
+.brand-mark{font-weight:800;color:#fff;background:var(--accent);padding:9px 12px;border-radius:5px;flex:0 0 auto}
+.title{font-size:22px;line-height:1.2;margin:0;font-weight:750;letter-spacing:-.025em;color:var(--ink)}
+.subtitle{margin:5px 0 0;color:var(--muted);font-size:12px}
+.date-badge{font-size:12px;color:var(--accent-light);background:var(--accent-pale);border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-weight:650}
+.tabs{padding:0 30px;border-bottom:1px solid var(--line);background:var(--topbar)}
+.tab{padding:15px 18px!important;border:0!important;border-bottom:3px solid transparent!important;background:var(--topbar)!important;color:var(--muted)!important;font-weight:650!important}
+.tab--selected{color:var(--accent-light)!important;border-bottom:3px solid var(--accent)!important;background:var(--topbar)!important}
+.content{max-width:1500px;margin:0 auto;padding:24px 30px 46px;background:var(--bg)}
+.footer{border-top:1px solid var(--line);padding:18px 30px;color:var(--muted);background:var(--bg);font-size:11px;text-align:center}
+.panel,.filterbar,.kpi-card,.side-card,.method-panel,.step-card{background:var(--panel);border:1px solid var(--line);color:var(--ink);box-shadow:none}
+.panel{border-radius:5px;padding:4px 8px 2px;min-width:0}
+.filterbar{display:flex;gap:14px;align-items:flex-end;border-radius:5px;padding:14px 16px;margin-bottom:14px}
+.filter-item{min-width:190px} .filter-item.grow{flex:1}
+.filter-item label{display:block;color:var(--muted);font-size:11px;font-weight:750;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin:0 0 12px}
+.section-title{color:var(--ink);font-size:16px;font-weight:750;margin:0}
+.section-sub,.note,.method-note{color:var(--muted);font-size:12px}
+.Select-control{background:var(--panel)!important;border:1px solid var(--line-2)!important;border-radius:4px!important;box-shadow:none!important;color:var(--ink)!important}
+.Select-control:hover{border-color:var(--accent-mid)!important}
+.is-focused:not(.is-open)>.Select-control{border-color:var(--accent)!important;box-shadow:0 0 0 1px var(--accent)!important}
+.Select-value-label,.Select-placeholder,.Select-input>input{color:var(--ink)!important}
+.Select-menu-outer,.Select-menu{background:var(--panel)!important;border-color:var(--line-2)!important;color:var(--ink)!important}
+.Select-option{background:var(--panel)!important;color:var(--ink)!important}
+.Select-option.is-focused{background:var(--panel-2)!important}
+.Select-option.is-selected{background:var(--accent)!important;color:#fff!important}
+.radio-group{display:flex;gap:14px;align-items:center;flex-wrap:wrap;color:var(--ink)}
+input[type="radio"],input[type="checkbox"]{accent-color:var(--accent)}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.kpi-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.kpi-card{border-radius:5px;padding:16px 17px;min-width:0}
+.kpi-label{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.055em;font-weight:800}
+.kpi-value{margin-top:7px;color:var(--ink);font-size:24px;font-weight:780;letter-spacing:-.035em}
+.kpi-sub{margin-top:5px;color:var(--muted);font-size:11px}
+.overview-grid{display:grid;grid-template-columns:minmax(0,3.2fr) minmax(280px,1fr);gap:14px;align-items:start}
+.overview-side{display:grid;gap:12px}
+.two-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.side-card{border-radius:5px;padding:15px 16px}
+.side-card h3{color:var(--ink);margin:0 0 12px;font-size:13px}
+.side-row{display:flex;justify-content:space-between;gap:16px;padding:7px 0;border-bottom:1px solid var(--line)}
+.side-row:last-child{border-bottom:0}
+.side-label{color:var(--muted);font-size:11px}
+.side-value{color:var(--ink);font-size:12px;font-weight:700;text-align:right}
+.alloc-row{display:grid;grid-template-columns:92px minmax(90px,1fr) 52px;align-items:center;gap:9px;margin:8px 0}
+.alloc-name{color:var(--ink);font-size:11px}
+.alloc-track{height:7px;border-radius:999px;background:var(--track);overflow:hidden}
+.alloc-fill{height:100%;border-radius:999px}
+.alloc-pct{color:var(--ink);text-align:right;font-size:11px;font-variant-numeric:tabular-nums}
+.meta-strip{display:flex;gap:8px 18px;flex-wrap:wrap;margin:0 0 12px;padding:11px 13px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--muted);font-size:11px}
+.legend-row,.regime-legend{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.legend-chip,.regime-key{display:inline-flex;gap:6px;align-items:center;color:var(--muted);font-size:11px}
+.regime-dot{width:9px;height:9px;border-radius:2px;flex:0 0 auto}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.step-card,.method-panel{border-radius:5px;padding:16px}
+.step-no{width:25px;height:25px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;background:var(--accent);font-size:11px;font-weight:800;margin-bottom:10px}
+.rc-slider{margin-top:4px}
+.rc-slider-rail{background:var(--line-2)!important}
+.rc-slider-track{background:var(--accent)!important}
+.rc-slider-handle{border:2px solid var(--accent)!important;background:var(--panel)!important;box-shadow:none!important}
+.rc-slider-handle:hover,.rc-slider-handle:focus{border-color:var(--accent-mid)!important}
+.rc-slider-dot{background:var(--panel)!important;border-color:var(--line-2)!important}
+.rc-slider-dot-active{border-color:var(--accent)!important}
+.rc-slider-mark-text{color:var(--muted)!important;font-size:10px;white-space:nowrap!important}
+.rc-slider-tooltip,.rc-slider-tooltip-placement-bottom,.rc-slider-tooltip-placement-top{display:none!important}
+.modebar{background:transparent!important} .modebar-btn path{fill:var(--muted)!important}
+@media(max-width:1100px){.overview-grid,.two-col{grid-template-columns:1fr}.kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.filterbar{flex-wrap:wrap}.filter-item{min-width:220px;flex:1}.topbar{padding:12px 16px;min-height:82px}.content{padding:18px 14px 36px}.tabs{padding:0 8px}.title{font-size:18px}.date-badge{display:none}}
+@media(max-width:640px){.kpi-grid,.kpi-grid-3,.steps{grid-template-columns:1fr}.subtitle{display:none}}
+/* Vintage slider: date follows the handle; no numeric tooltip */
+.vintage-slider-wrap{
+  position:relative;
+  padding:4px 8px 34px;
+}
+.vintage-handle-date{
+  position:absolute;
+  top:31px;
+  z-index:5;
+  color:#C4B5FD;
+  background:transparent;
+  border:0;
+  padding:0;
+  margin:0;
+  font-size:11px;
+  line-height:1;
+  font-weight:750;
+  white-space:nowrap;
+  pointer-events:none;
+  font-variant-numeric:tabular-nums;
+}
+.rc-slider-tooltip,
+.rc-slider-tooltip-placement-bottom,
+.rc-slider-tooltip-placement-top,
+.rc-tooltip,
+.rc-tooltip-content,
+.rc-tooltip-inner{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+/* =========================================================
+   VINTAGE SLIDER — date follows handle, no native tooltip
+   ========================================================= */
+.vintage-slider-wrap {
+    position: relative;
+    padding: 4px 8px 52px 8px;
+}
+
+.vintage-slider-wrap .rc-slider {
+    margin-top: 4px;
+}
+
+/* 실제 YYYY-MM-DD 라벨 */
+.vintage-handle-date {
+    position: absolute !important;
+    top: 23px !important;
+    z-index: 50 !important;
+
+    color: #C4B5FD !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    font-size: 11px !important;
+    font-weight: 750 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    pointer-events: none !important;
+    font-variant-numeric: tabular-nums;
+}
+
+/* 연도 눈금은 날짜보다 아래로 내려서 겹치지 않게 */
+.vintage-slider-wrap .rc-slider-mark {
+    top: 39px !important;
+}
+
+/* 245 같은 기본 흰 tooltip 완전 제거 */
+.vintage-slider-wrap .rc-slider-tooltip,
+.vintage-slider-wrap .rc-slider-tooltip *,
+.vintage-slider-wrap .rc-tooltip,
+.vintage-slider-wrap .rc-tooltip *,
+.vintage-slider-wrap [class*="rc-slider-tooltip"],
+.vintage-slider-wrap [class*="rc-tooltip"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+
+/* =========================================================
+   DARK MODE — ALL DROPDOWNS
+   ========================================================= */
+
+/* 닫혀 있는 드롭다운 */
+.Select,
+.Select-control {
+    background: #0F172A !important;
+    color: #F8FAFC !important;
+}
+
+.Select-control {
+    border: 1px solid #334155 !important;
+    box-shadow: none !important;
+}
+
+.Select-control:hover {
+    border-color: #A78BFA !important;
+}
+
+.is-focused:not(.is-open) > .Select-control {
+    border-color: #8B5CF6 !important;
+    box-shadow: 0 0 0 1px #8B5CF6 !important;
+}
+
+/* 선택된 값 */
+.Select--single > .Select-control .Select-value,
+.Select-value {
+    background: transparent !important;
+}
+
+.Select--single > .Select-control .Select-value .Select-value-label,
+.Select-value-label {
+    color: #F8FAFC !important;
+    background: transparent !important;
+}
+
+/* placeholder / 검색 입력 */
+.Select-placeholder {
+    color: #94A3B8 !important;
+}
+
+.Select-input,
+.Select-input > input {
+    color: #F8FAFC !important;
+    background: transparent !important;
+}
+
+/* 화살표 */
+.Select-arrow {
+    border-top-color: #C4B5FD !important;
+}
+
+.is-open > .Select-control .Select-arrow {
+    border-bottom-color: #C4B5FD !important;
+}
+
+/* 펼친 목록 */
+.Select-menu-outer,
+.Select-menu {
+    background: #0F172A !important;
+    border-color: #334155 !important;
+    color: #F8FAFC !important;
+}
+
+.Select-option,
+.VirtualizedSelectOption {
+    background: #0F172A !important;
+    color: #F8FAFC !important;
+}
+
+.Select-option.is-focused,
+.VirtualizedSelectFocusedOption {
+    background: #1E293B !important;
+    color: #FFFFFF !important;
+}
+
+.Select-option.is-selected {
+    background: #7C3AED !important;
+    color: #FFFFFF !important;
+}
+
+/* clear 아이콘 */
+.Select-clear {
+    color: #94A3B8 !important;
+}
+
+.Select-clear:hover {
+    color: #F8FAFC !important;
+}

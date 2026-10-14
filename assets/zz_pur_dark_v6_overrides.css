@@ -1,0 +1,102 @@
+/* PUR Dark v6 — visible caret, natural control widths, and slider cleanup. */
+.filterbar {display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;}
+.filterbar .filter-item {flex:0 0 auto;min-width:0;max-width:100%;}
+.filterbar .filter-item.grow {flex:1 1 320px;min-width:260px;}
+.overview-filterbar {justify-content:flex-start;}
+.overview-filterbar .overview-indicator {width:min(100%,340px);flex:0 1 340px;}
+.overview-filterbar .filter-item:not(.overview-indicator) {width:176px;flex:0 0 176px;}
+.filterbar:has(#exp-group) .filter-item:first-child {width:min(100%,320px);flex:0 1 320px;}
+.filterbar:has(#exp-var) .filter-item.grow {max-width:620px;flex:1 1 320px;}
+.filterbar:has(#reg-month) .filter-item:last-child {width:164px;flex:0 0 164px;}
+.filterbar:has(#taa-case) .filter-item.grow {flex:0 1 280px;width:min(100%,280px);}
+.filterbar:has(#taa-method) .filter-item:last-child {width:180px;flex:0 0 180px;}
+.dropdown-wrap {position:relative;width:100%;min-width:0;}
+.dropdown-wrap .dark-dropdown {width:100%;min-width:0;}
+.dropdown-caret {position:absolute;top:50%;right:13px;z-index:11;transform:translateY(-51%);color:#C4B5FD;pointer-events:none;font-size:18px;font-family:Arial,sans-serif;line-height:1;font-weight:700;text-shadow:0 0 1px #C4B5FD;}
+/* Hide native caret which otherwise duplicates the v6 visible one. */
+.dropdown-wrap .Select-arrow-zone,.dropdown-wrap [class*="-dropdownIndicator"] {opacity:0!important;}
+.dropdown-wrap .Select-value-label,.dropdown-wrap [class*="-singleValue"] {color:#F8FAFC!important;}
+.dropdown-wrap .Select-control,.dropdown-wrap [class*="-control"] {padding-right:27px!important;min-height:38px!important;}
+.dropdown-wrap .Select-menu-outer {z-index:2000!important;}
+/* Different Dash/react-select versions may create numerical tooltip outside the slider. */
+.vintage-slider-wrap .rc-slider-tooltip,
+.vintage-slider-wrap .rc-tooltip,
+.vintage-slider-wrap [class*="tooltip"],
+.rc-tooltip,.rc-tooltip-inner,.rc-tooltip-content,
+.rc-slider-tooltip,.dash-slider-tooltip {display:none!important;visibility:hidden!important;}
+/* Month date is owned by the separate HTML label, never a numerical index. */
+.vintage-handle-date {top:24px!important;color:#C4B5FD!important;}
+@media(max-width:680px){
+ .overview-filterbar .overview-indicator,.overview-filterbar .filter-item:not(.overview-indicator),
+ .filterbar:has(#exp-group) .filter-item:first-child,.filterbar:has(#exp-var) .filter-item.grow,
+ .filterbar:has(#taa-case) .filter-item.grow {width:100%;flex:1 1 100%;max-width:100%;}
+ .filterbar .filter-item {flex:1 1 170px;}
+}
+
+
+/* 1012 v6 hotfix: native month range eliminates the stray numerical value. */
+.vintage-slider-wrap {
+    position:relative!important;
+    padding:9px 0 61px!important;
+}
+.vintage-slider-wrap input.vintage-range {
+    display:block!important;
+    appearance:none!important;
+    -webkit-appearance:none!important;
+    width:100%!important;
+    min-width:0!important;
+    height:4px!important;
+    margin:4px 0 0!important;
+    padding:0!important;
+    outline:none!important;
+    border:0!important;
+    border-radius:100px!important;
+    cursor:pointer!important;
+    background:linear-gradient(90deg,
+        #8B5CF6 0%, #8B5CF6 var(--vintage-progress, 100%),
+        #334155 var(--vintage-progress, 100%), #334155 100%)!important;
+    box-shadow:none!important;
+}
+.vintage-slider-wrap input.vintage-range::-webkit-slider-thumb {
+    -webkit-appearance:none!important;
+    appearance:none!important;
+    width:19px!important;height:19px!important;
+    background:#0F172A!important;
+    border:2px solid #C4B5FD!important;
+    border-radius:50%!important;
+    box-shadow:0 0 0 2px #0F172A!important;
+    cursor:grab!important;
+}
+.vintage-slider-wrap input.vintage-range:active::-webkit-slider-thumb { cursor:grabbing!important; }
+.vintage-slider-wrap input.vintage-range::-moz-range-thumb {
+    width:17px!important;height:17px!important;
+    background:#0F172A!important;
+    border:2px solid #C4B5FD!important;
+    border-radius:50%!important;
+    cursor:grab!important;
+}
+.vintage-slider-wrap input.vintage-range:focus-visible {
+    outline:2px solid #A78BFA!important;outline-offset:6px!important;
+}
+.vintage-slider-wrap .vintage-handle-date {
+    top:28px!important;
+    font-size:11px!important;
+    color:#C4B5FD!important;
+    z-index:20!important;
+}
+.vintage-year-marks {
+    position:absolute;
+    top:50px;
+    width:100%;
+    left:0;
+    height:20px;
+    pointer-events:none;
+}
+.vintage-year {
+    position:absolute;
+    font-size:10px;
+    font-weight:550;
+    white-space:nowrap;
+    color:#94A3B8;
+    opacity:.9;
+}

@@ -1,0 +1,217 @@
+/* =========================================================
+   PURPLE DARK v5 — CACHE-BUSTED FINAL OVERRIDES
+   ========================================================= */
+
+/* ---------- ALL DASH DROPDOWNS: old react-select ---------- */
+.dark-dropdown,
+.dark-dropdown .Select,
+.dark-dropdown .Select-control {
+    background: #0F172A !important;
+    color: #F8FAFC !important;
+}
+
+.dark-dropdown .Select-control {
+    border: 1px solid #334155 !important;
+    box-shadow: none !important;
+}
+
+.dark-dropdown .Select-control:hover {
+    border-color: #A78BFA !important;
+}
+
+.dark-dropdown.is-focused:not(.is-open) > .Select-control,
+.dark-dropdown .is-focused:not(.is-open) > .Select-control {
+    border-color: #8B5CF6 !important;
+    box-shadow: 0 0 0 1px #8B5CF6 !important;
+}
+
+.dark-dropdown .Select-value,
+.dark-dropdown .Select-value-label,
+.dark-dropdown .Select--single > .Select-control .Select-value,
+.dark-dropdown .Select--single > .Select-control .Select-value .Select-value-label {
+    color: #F8FAFC !important;
+    background: transparent !important;
+}
+
+.dark-dropdown .Select-placeholder {
+    color: #94A3B8 !important;
+}
+
+.dark-dropdown .Select-input,
+.dark-dropdown .Select-input > input {
+    color: #F8FAFC !important;
+    background: transparent !important;
+}
+
+.dark-dropdown .Select-arrow {
+    border-top-color: #C4B5FD !important;
+}
+
+.dark-dropdown .is-open > .Select-control .Select-arrow {
+    border-bottom-color: #C4B5FD !important;
+}
+
+.dark-dropdown .Select-menu-outer,
+.dark-dropdown .Select-menu {
+    background: #0F172A !important;
+    border-color: #334155 !important;
+    color: #F8FAFC !important;
+}
+
+.dark-dropdown .Select-option,
+.dark-dropdown .VirtualizedSelectOption {
+    background: #0F172A !important;
+    color: #F8FAFC !important;
+}
+
+.dark-dropdown .Select-option.is-focused,
+.dark-dropdown .VirtualizedSelectFocusedOption {
+    background: #1E293B !important;
+    color: #FFFFFF !important;
+}
+
+.dark-dropdown .Select-option.is-selected {
+    background: #7C3AED !important;
+    color: #FFFFFF !important;
+}
+
+.dark-dropdown .Select-clear {
+    color: #94A3B8 !important;
+}
+
+/* ---------- ALL DASH DROPDOWNS: current react-select ---------- */
+.dark-dropdown [class*="-control"] {
+    background: #0F172A !important;
+    border-color: #334155 !important;
+    box-shadow: none !important;
+    color: #F8FAFC !important;
+}
+
+.dark-dropdown [class*="-control"]:hover {
+    border-color: #A78BFA !important;
+}
+
+.dark-dropdown [class*="-singleValue"] {
+    color: #F8FAFC !important;
+}
+
+.dark-dropdown [class*="-placeholder"] {
+    color: #94A3B8 !important;
+}
+
+.dark-dropdown [class*="-input"],
+.dark-dropdown [class*="-Input"] {
+    color: #F8FAFC !important;
+}
+
+.dark-dropdown [class*="-menu"],
+.dark-dropdown [class*="-Menu"] {
+    background: #0F172A !important;
+    color: #F8FAFC !important;
+}
+
+.dark-dropdown [class*="-menuList"],
+.dark-dropdown [class*="-MenuList"] {
+    background: #0F172A !important;
+}
+
+.dark-dropdown [class*="-option"],
+.dark-dropdown [class*="-Option"] {
+    background: #0F172A !important;
+    color: #F8FAFC !important;
+}
+
+.dark-dropdown [class*="-option"]:hover,
+.dark-dropdown [class*="-Option"]:hover {
+    background: #1E293B !important;
+    color: #FFFFFF !important;
+}
+
+.dark-dropdown [class*="-indicatorSeparator"] {
+    background-color: #334155 !important;
+}
+
+.dark-dropdown [class*="-indicatorContainer"] {
+    color: #C4B5FD !important;
+}
+
+/* Fallback for Dash-generated dropdown internals */
+.dash-dropdown [class*="-control"] {
+    background: #0F172A !important;
+    border-color: #334155 !important;
+    color: #F8FAFC !important;
+}
+.dash-dropdown [class*="-singleValue"] { color: #F8FAFC !important; }
+.dash-dropdown [class*="-placeholder"] { color: #94A3B8 !important; }
+.dash-dropdown [class*="-menu"] { background: #0F172A !important; color:#F8FAFC !important; }
+.dash-dropdown [class*="-option"] { background:#0F172A !important; color:#F8FAFC !important; }
+
+/* ---------- VINTAGE SLIDER ---------- */
+.vintage-slider-wrap {
+    position: relative !important;
+    padding: 4px 0 55px 0 !important;
+}
+
+.vintage-slider {
+    margin: 0 !important;
+}
+
+/* Custom date follows handle */
+.vintage-handle-date {
+    position: absolute !important;
+    top: 25px !important;
+    z-index: 999 !important;
+
+    color: #C4B5FD !important;
+    background: transparent !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    width: auto !important;
+    height: auto !important;
+
+    font-size: 11px !important;
+    font-weight: 750 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    pointer-events: none !important;
+    font-variant-numeric: tabular-nums;
+}
+
+.vintage-slider-wrap .rc-slider-mark {
+    top: 42px !important;
+}
+
+/* Kill every known Slider/rc tooltip implementation */
+.vintage-slider-wrap .rc-slider-tooltip,
+.vintage-slider-wrap .rc-slider-tooltip *,
+.vintage-slider-wrap .rc-tooltip,
+.vintage-slider-wrap .rc-tooltip *,
+.vintage-slider-wrap .dash-slider-tooltip,
+.vintage-slider-wrap [class*="rc-slider-tooltip"],
+.vintage-slider-wrap [class*="rc-tooltip"],
+.vintage-slider-wrap [class*="slider-tooltip"],
+.vintage-slider-wrap [class*="SliderTooltip"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+}
+
+/* Ensure dark Plotly/Dash cards do not introduce white callouts */
+.vintage-slider-wrap input,
+.vintage-slider-wrap output {
+    background: transparent !important;
+    color: #C4B5FD !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}

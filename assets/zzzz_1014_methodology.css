@@ -1,0 +1,34 @@
+
+/* Methodology / 2026.10 final-report layout. Scoped to this tab only. */
+.method-v2 {max-width:1280px; margin:0 auto; color:#E2E8F0;}
+.method-v2 *, .method-v2 *::before, .method-v2 *::after {box-sizing:border-box;}
+.method-v2-hero {background:linear-gradient(115deg,#191536 0%,#111C32 80%);border:1px solid #54457C;border-radius:16px;padding:25px 28px;margin-bottom:15px;}
+.method-v2-eyebrow {font-size:11px;letter-spacing:.13em;font-weight:800;color:#C4B5FD;margin-bottom:9px;}
+.method-v2-hero h2 {margin:0 0 12px;color:#F8FAFC;font-size:25px;line-height:1.4;}
+.method-v2-hero p {color:#CBD5E1;line-height:1.8;font-size:13px;margin:4px 0;}
+.method-v2-nav {display:flex;gap:9px;flex-wrap:wrap;margin:16px 0 23px;}
+.method-v2-nav a {display:inline-flex;text-decoration:none;color:#D8CCFF;background:#151D36;border:1px solid #34405B;border-radius:9px;padding:10px 13px;font-size:12px;font-weight:750;}
+.method-v2-nav a:hover {background:#2B2256;border-color:#A78BFA;color:#FFFFFF;}
+.method-v2-section {scroll-margin-top:20px;margin:16px 0 25px;border:1px solid #30405B;background:#0F172A;border-radius:15px;padding:23px 24px;}
+.method-v2-section-head {display:flex;align-items:flex-start;gap:14px;padding-bottom:14px;border-bottom:1px solid #27384F;margin-bottom:16px;}
+.method-v2-number {display:flex;align-items:center;justify-content:center;background:#2A2154;color:#DCCFFF;font-weight:800;font-size:15px;border-radius:10px;width:44px;min-width:44px;height:44px;}
+.method-v2-title {font-size:19px;margin:0;color:#F8FAFC;line-height:1.5;}
+.method-v2-kicker {font-size:12px;color:#9CB2D4;margin:4px 0 0;}
+.method-v2-intro {font-size:13px;line-height:1.83;color:#C3D0E5;margin:7px 0 14px;}
+.method-v2-sub {color:#DDD4FF;font-size:15px;margin:22px 0 11px;font-weight:800;}
+.method-v2-equation {border:1px solid #2D3B57;background:#172136;border-radius:11px;margin:12px 0;padding:15px 18px;min-width:0;}
+.method-v2-formula-label {font-size:12px;color:#C4B5FD;font-weight:800;letter-spacing:.005em;margin-bottom:7px;}
+.method-v2-math {color:#F3F5FC;overflow-x:auto;overflow-y:hidden;min-width:0;font-size:14px;line-height:1.6;}
+.method-v2-math .MathJax {color:#F8FAFC!important;}
+.method-v2-math p {margin:9px 0;}
+.method-v2-description {font-size:12px;color:#AEC0DD;line-height:1.75;margin-top:9px;}
+.method-v2-notes {background:#111E30;border-left:3px solid #8B5CF6;border-radius:0 9px 9px 0;padding:12px 15px;color:#B7C8E2;font-size:12px;line-height:1.75;margin:16px 0;}
+.method-v2-table-wrap {overflow-x:auto;margin:12px 0 18px;}
+.method-v2-table {width:100%;border-collapse:collapse;min-width:500px;font-size:12px;}
+.method-v2-table th {text-align:left;color:#D8CBFF;background:#242044;font-weight:800;white-space:nowrap;}
+.method-v2-table td {color:#D0DCF1;background:#142037;}
+.method-v2-table td,.method-v2-table th {padding:10px 13px;border:1px solid #33425D;line-height:1.55;}
+.method-v2-regimes {display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.method-v2-regime {background:#15213A;border:1px solid #33425D;border-left:4px solid;border-radius:7px;padding:9px 11px;font-size:12px;font-weight:700;color:#EFF3FC;}
+.method-v2-footer {font-size:12px;color:#9EB2D3;margin:22px 0;line-height:1.8;}
+@media(max-width:650px){.method-v2-section{padding:14px}.method-v2-hero{padding:18px}.method-v2-title{font-size:17px}.method-v2-equation{padding:12px 10px}.method-v2-nav a{font-size:11px}.method-v2-math{font-size:12px;}}

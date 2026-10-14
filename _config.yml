@@ -1,0 +1,7 @@
+title: KR-MD & TAA Dashboard
+markdown: kramdown
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - .github
