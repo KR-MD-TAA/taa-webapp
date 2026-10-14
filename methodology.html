@@ -1,172 +1,276 @@
-<style>
-/* Scoped to methodology component; compatible with the existing dark/light theme. */
-.method-v2 .method-v2-bullets {margin:12px 0 18px;padding:0;list-style:none;display:grid;gap:7px;}
-.method-v2 .method-v2-bullets li {position:relative;padding-left:17px;line-height:1.65;word-break:keep-all;overflow-wrap:break-word;}
-.method-v2 .method-v2-bullets li::before {content:"•";position:absolute;left:0;top:0;color:#68b2ff;font-weight:700;}
-.method-v2 .method-v2-bullets.compact {margin:8px 0 10px;gap:5px;}
-.method-v2 .method-v2-bullets.compact li {font-size:.94em;line-height:1.5;}
-.method-v2 .method-v2-flow-scroll {width:100%;overflow-x:auto;padding:6px 1px 14px;scrollbar-width:thin;}
-.method-v2 .method-v2-flow {display:grid;grid-template-columns:minmax(158px,1fr) 22px minmax(170px,1fr) 22px minmax(205px,1.2fr) 22px minmax(150px,.94fr);align-items:stretch;gap:8px;min-width:780px;}
-.method-v2 .method-v2-flow-cell {min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:7px;padding:17px 11px 15px;border:1px solid rgba(130,163,203,.27);border-radius:12px;background:rgba(105,143,185,.075);text-align:center;box-sizing:border-box;}
-.method-v2 .method-v2-flow-index {font-size:.69rem;letter-spacing:.08em;opacity:.68;line-height:1;}
-.method-v2 .method-v2-flow-title {font-weight:750;font-size:.98rem;line-height:1.4;}
-.method-v2 .method-v2-flow-detail {font-size:.8rem;line-height:1.48;opacity:.82;word-break:keep-all;}
-.method-v2 .method-v2-flow-arrow {font-size:23px;line-height:1;align-self:center;justify-self:center;color:#68b2ff;}
-.method-v2 .method-v2-flow-math {margin-top:auto;padding-top:8px;width:100%;border-top:1px solid rgba(130,163,203,.22);font-size:.83em;overflow-x:auto;}
-.method-v2 .method-v2-flow-math mjx-container {margin:5px 0 0!important;}
-.method-v2 .method-v2-note-tight {margin-top:6px!important;line-height:1.6;}
-.method-v2 .method-v2-equation .method-v2-math {overflow-x:auto;overflow-y:hidden;}
-.method-v2 .method-v2-model-card {margin-top:12px;margin-bottom:12px;}
-.method-v2 .method-v2-model-card .method-v2-description {line-height:1.65;}
-.method-v2 .method-v2-model-card .method-v2-description b {font-weight:700;}
-.method-v2 .method-v2-intro-tight {margin-bottom:9px!important;}
-.method-v2 .method-v2-table-wrap {overflow-x:auto;}
-@media (max-width:650px) {
-  .method-v2 .method-v2-flow {min-width:740px;}
-  .method-v2 .method-v2-flow-cell {padding:13px 9px;}
-  .method-v2 .method-v2-flow-scroll {scroll-snap-type:x proximity;}
-  .method-v2 .method-v2-flow-cell {scroll-snap-align:start;}
-}
-</style><div class="method-v2"><div class="method-v2-hero"><div class="method-v2-eyebrow">FINAL RESEARCH REPORT · OCT 2026</div><h2>Methodology · KR-MD &amp; Regime-Based TAA</h2><p>KR-MD 구축 → 거시경제 국면식별 → 국면별 수익률 예측 → 자산배분 → 성과평가</p></div><div class="method-v2-nav"><a href="#method-krmd">01 · KR-MD</a><a href="#method-regime">02 · Regime Identification</a><a href="#method-taa">03 · TAA Models</a><a href="#method-constraints">04 · Constraints</a><a href="#method-performance">05 · Performance</a></div><section class="method-v2-section" id="method-krmd">
-<div class="method-v2-section-head"><div class="method-v2-number">01</div><div><h3 class="method-v2-title">KR-MD Construction &amp; Preprocessing</h3><p class="method-v2-kicker">자료 구축 · 변수 변환 및 순환변동치 · 월별 보간 · 표준화</p></div></div>
+<!-- KR-MD & TAA · Methodology fragment. Styles: assets/style.css; math rendered by local MathJax. -->
+<div class="method-v2">
+<div class="method-v2-hero">
+<div class="method-v2-eyebrow">FINAL RESEARCH REPORT · OCT 2026</div>
+<h2>Methodology · KR-MD &amp; Regime-Based TAA</h2>
+<p>KR-MD 구축 → 거시경제 국면식별 → 국면별 수익률 예측 → 자산배분 → 성과평가</p>
+</div>
+<div class="method-v2-nav">
+<a href="#method-krmd">01 · KR-MD</a>
+<a href="#method-regime">02 · Regime Identification</a>
+<a href="#method-taa">03 · TAA Models</a>
+<a href="#method-constraints">04 · Constraints</a>
+<a href="#method-performance">05 · Performance</a>
+</div>
+<section class="method-v2-section" id="method-krmd">
+<div class="method-v2-section-head">
+<div class="method-v2-number">01</div>
+<div>
+<h3 class="method-v2-title">KR-MD Construction &amp; Preprocessing</h3>
+<p class="method-v2-kicker">자료 구축 · 변수 변환 및 순환변동치 · 월별 보간 · 표준화</p>
+</div>
+</div>
 <ul class="method-v2-bullets">
 <li>FRED-MD/QD의 분류체계를 참고하여 <strong>13개 부문, 204개 변수</strong> 구축(월별 146개, 분기별 58개)</li>
 <li>잡음·유사 변수 검토 후 <strong>126개 변수</strong> 선별; Vintage별 가용성을 반영하여 <strong>월평균 약 69개 변수</strong>를 국면식별에 활용</li>
 </ul>
 <div aria-label="KR-MD 구축 및 전처리 흐름: 자료 입수, 변수변환 및 순환변동치, 분기자료 월보간, 표준화" class="method-v2-flow-scroll">
 <div class="method-v2-flow">
-<div class="method-v2-flow-cell"><div class="method-v2-flow-index">STEP 01</div><div class="method-v2-flow-title">거시경제·금융자료 입수</div><div class="method-v2-flow-detail">ECOS · KOSIS API 활용</div></div>
+<div class="method-v2-flow-cell">
+<div class="method-v2-flow-index">STEP 01</div>
+<div class="method-v2-flow-title">거시경제·금융자료 입수</div>
+<div class="method-v2-flow-detail">ECOS · KOSIS API 활용</div>
+</div>
 <div aria-hidden="true" class="method-v2-flow-arrow">→</div>
-<div class="method-v2-flow-cell"><div class="method-v2-flow-index">STEP 02</div><div class="method-v2-flow-title">변수변환 및 순환변동치 산출</div><div class="method-v2-flow-detail">변수별 특성을 고려한 로그·차분·계절조정·HP 필터 등 적용</div></div>
+<div class="method-v2-flow-cell">
+<div class="method-v2-flow-index">STEP 02</div>
+<div class="method-v2-flow-title">변수변환 및 순환변동치 산출</div>
+<div class="method-v2-flow-detail">변수별 특성을 고려한 로그·차분·계절조정·HP 필터 등 적용</div>
+</div>
 <div aria-hidden="true" class="method-v2-flow-arrow">→</div>
-<div class="method-v2-flow-cell"><div class="method-v2-flow-index">STEP 03</div><div class="method-v2-flow-title">분기자료의 월보간</div><div class="method-v2-flow-detail">Kalman filter 기반 월별 잠재계열 추정</div><div class="method-v2-flow-math">\[z_t=z_{t-1}+\eta_t,\quad \eta_t\sim N(0,Q)\]</div></div>
+<div class="method-v2-flow-cell">
+<div class="method-v2-flow-index">STEP 03</div>
+<div class="method-v2-flow-title">분기자료의 월보간</div>
+<div class="method-v2-flow-detail">Kalman filter 기반 월별 잠재계열 추정</div>
+<div class="method-v2-flow-math">\[z_t=z_{t-1}+\eta_t,\quad \eta_t\sim N(0,Q)\]</div>
+</div>
 <div aria-hidden="true" class="method-v2-flow-arrow">→</div>
-<div class="method-v2-flow-cell"><div class="method-v2-flow-index">STEP 04</div><div class="method-v2-flow-title">변수 스케일 표준화</div><div class="method-v2-flow-detail">변수별 평균·표준편차를 이용한 정규화</div></div>
+<div class="method-v2-flow-cell">
+<div class="method-v2-flow-index">STEP 04</div>
+<div class="method-v2-flow-title">변수 스케일 표준화</div>
+<div class="method-v2-flow-detail">변수별 평균·표준편차를 이용한 정규화</div>
+</div>
 </div>
 </div>
 <div class="method-v2-notes method-v2-note-tight">• Vintage 처리: 각 시점까지 이용 가능한 정보만으로 변수변환·월보간·표준화를 수행하며, 미래 관측치는 활용하지 않음</div>
-</section><section class="method-v2-section" id="method-regime">
-<div class="method-v2-section-head"><div class="method-v2-number">02</div><div><h3 class="method-v2-title">Macroeconomic Regime Identification</h3><p class="method-v2-kicker">PCA · 2-Stage Layered K-means · Vintage 간 국면 정렬 · 확률 및 전이</p></div></div>
+</section>
+<section class="method-v2-section" id="method-regime">
+<div class="method-v2-section-head">
+<div class="method-v2-number">02</div>
+<div>
+<h3 class="method-v2-title">Macroeconomic Regime Identification</h3>
+<p class="method-v2-kicker">PCA · 2-Stage Layered K-means · Vintage 간 국면 정렬 · 확률 및 전이</p>
+</div>
+</div>
 <ul class="method-v2-bullets">
 <li>KR-MD의 고차원 정보를 PCA 공통요인으로 축약한 후, 두 단계 군집분석을 통해 경제국면 식별</li>
-<li><strong>Global PCA</strong>: 전체 변수의 공통요인 추출 / <strong>Grouped PCA</strong>: 경제부문별 요인 추출 후 결합</li>
+<li>
+<strong>Global PCA</strong>: 전체 변수의 공통요인 추출 / <strong>Grouped PCA</strong>: 경제부문별 요인 추출 후 결합</li>
 </ul>
-<div class="method-v2-equation"><div class="method-v2-formula-label">Global PCA 및 Grouped PCA</div>
+<div class="method-v2-equation">
+<div class="method-v2-formula-label">Global PCA 및 Grouped PCA</div>
 <div class="method-v2-math">\[\begin{aligned}\text{Global:}\quad &amp;\mathbf z_t=W^{T}\mathbf x_t\\[5pt]\text{Grouped:}\quad &amp;\mathbf z_{g,t}=W_g^{T}\mathbf x_{g,t},\quad \mathbf z_t=(\mathbf z_{1,t}^{T},\ldots,\mathbf z_{G,t}^{T})^{T}\end{aligned}\]</div>
 <div class="method-v2-description">\(\mathbf x_t\): 표준화 변수 벡터, \(W\): PCA 적재행렬, \(g\): 경제부문</div>
 </div>
 <div class="method-v2-sub">2-Stage Layered K-means</div>
 <ul class="method-v2-bullets compact">
-<li><strong>1단계</strong>: Euclidean K-means로 일반적인 경기기간과 구별되는 위기기간(R0) 식별</li>
-<li><strong>2단계</strong>: 나머지 기간에 cosine distance 기반 Spherical K-means 적용, R1~R4 구분</li>
+<li>
+<strong>1단계</strong>: Euclidean K-means로 일반적인 경기기간과 구별되는 위기기간(R0) 식별</li>
+<li>
+<strong>2단계</strong>: 나머지 기간에 cosine distance 기반 Spherical K-means 적용, R1~R4 구분</li>
 </ul>
 <div class="method-v2-regimes">
-<div class="method-v2-regime" style="border-left-color:#4F83FF">R0  위기</div><div class="method-v2-regime" style="border-left-color:#FFB020">R1  둔화</div><div class="method-v2-regime" style="border-left-color:#3DDC97">R2  안정</div><div class="method-v2-regime" style="border-left-color:#FF5A6F">R3  금융불안</div><div class="method-v2-regime" style="border-left-color:#B388FF">R4  과열</div>
+<div class="method-v2-regime" style="border-left-color:#4F83FF">R0  위기</div>
+<div class="method-v2-regime" style="border-left-color:#FFB020">R1  둔화</div>
+<div class="method-v2-regime" style="border-left-color:#3DDC97">R2  안정</div>
+<div class="method-v2-regime" style="border-left-color:#FF5A6F">R3  금융불안</div>
+<div class="method-v2-regime" style="border-left-color:#B388FF">R4  과열</div>
 </div>
 <div class="method-v2-sub">Vintage 간 Label Switching 보정</div>
-<div class="method-v2-equation"><div class="method-v2-formula-label">Hungarian Algorithm: 직전 Vintage와 공통 과거기간의 라벨 중복 최대화</div>
+<div class="method-v2-equation">
+<div class="method-v2-formula-label">Hungarian Algorithm: 직전 Vintage와 공통 과거기간의 라벨 중복 최대화</div>
 <div class="method-v2-math">\[\pi_v^{*}=\arg\max_{\pi}\sum_{t\in\mathcal T_v}\mathbf 1\!\left[\pi\!\left(R_t^{(v)}\right)=R_t^{(v-1)}\right]\]</div>
 <div class="method-v2-description">\(\mathcal T_v\): 연속 두 Vintage의 공통 과거기간, \(\pi_v\): 국면 라벨 재배열</div>
 </div>
 <div class="method-v2-sub">국면 소속확률 및 다음 월 국면확률</div>
-<div class="method-v2-equation"><div class="method-v2-formula-label">군집 중심과의 거리에 기초한 소속확률</div>
+<div class="method-v2-equation">
+<div class="method-v2-formula-label">군집 중심과의 거리에 기초한 소속확률</div>
 <div class="method-v2-math">\[S_t=\sum_{j=0}^{K}d_{j,t},\qquad p_{i,t}=\frac{S_t-d_{i,t}}{K S_t},\qquad \sum_{i=0}^{K}p_{i,t}=1\]</div>
 <div class="method-v2-description">\(d_{i,t}\): 국면 \(i\)의 중심과 시점 \(t\)의 거리; 위기국면에는 별도의 위기점수 반영</div>
 </div>
-<div class="method-v2-equation"><div class="method-v2-formula-label">과거 국면 전이에 따른 경험적 전이행렬</div>
+<div class="method-v2-equation">
+<div class="method-v2-formula-label">과거 국면 전이에 따른 경험적 전이행렬</div>
 <div class="method-v2-math">\[e_{ij,t}=\frac{\sum_{s=1}^{t-1}\mathbf 1(R_s=i,\ R_{s+1}=j)}{\sum_{s=1}^{t-1}\mathbf 1(R_s=i)}\]</div>
 <div class="method-v2-description">\(e_{ij,t}\): 국면 \(i\)에서 \(j\)로의 전이확률; 전이 사례가 없는 국면은 별도 처리</div>
 </div>
-<div class="method-v2-equation"><div class="method-v2-formula-label">다음 월 예상 국면확률</div>
+<div class="method-v2-equation">
+<div class="method-v2-formula-label">다음 월 예상 국면확률</div>
 <div class="method-v2-math">\[\widetilde{\mathbf p}_{t+1}^{T}=\mathbf p_t^{T}E_t\]</div>
 <div class="method-v2-description">현재 국면 소속확률 \(\mathbf p_t\)에 경험적 전이행렬 \(E_t\) 적용</div>
 </div>
-</section><section class="method-v2-section" id="method-taa">
-<div class="method-v2-section-head"><div class="method-v2-number">03</div><div><h3 class="method-v2-title">Regime-Based Tactical Asset Allocation</h3><p class="method-v2-kicker">Naive · Ridge · Black–Litterman · 기대수익률 및 위험 추정</p></div></div>
+</section>
+<section class="method-v2-section" id="method-taa">
+<div class="method-v2-section-head">
+<div class="method-v2-number">03</div>
+<div>
+<h3 class="method-v2-title">Regime-Based Tactical Asset Allocation</h3>
+<p class="method-v2-kicker">Naive · Ridge · Black–Litterman · 기대수익률 및 위험 추정</p>
+</div>
+</div>
 <ul class="method-v2-bullets">
-<li>다음 월 국면을 하나로 확정하지 않고, <strong>예상 국면확률을 자산수익률 전망에 반영</strong></li>
+<li>다음 월 국면을 하나로 확정하지 않고, <strong>예상 국면확률을 자산수익률 전망에 반영</strong>
+</li>
 </ul>
 <div class="method-v2-sub">국면별 수익률 예측 방법</div>
-<div class="method-v2-equation method-v2-model-card"><div class="method-v2-formula-label">Naive — 동일 국면의 과거 평균수익률</div>
+<div class="method-v2-equation method-v2-model-card">
+<div class="method-v2-formula-label">Naive — 동일 국면의 과거 평균수익률</div>
 <div class="method-v2-math">\[\widehat r_{j,t+1}^{(i)}=\operatorname{mean}\!\left\{r_{j,s}:s\le t,\ R_s=i\right\}\]</div>
 <div class="method-v2-description">• 과거 동일 국면 \(i\)의 자산 \(j\) 실현수익률 평균을 다음 월 조건부 기대수익률로 사용</div>
 </div>
-<div class="method-v2-equation method-v2-model-card"><div class="method-v2-formula-label">Ridge — 거시요인 기반 국면별 예측 및 L2 정규화</div>
+<div class="method-v2-equation method-v2-model-card">
+<div class="method-v2-formula-label">Ridge — 거시요인 기반 국면별 예측 및 L2 정규화</div>
 <div class="method-v2-math">\[\begin{aligned}\widehat{\beta}_{i,j}&amp;=\arg\min_{\beta}\left[\sum_{s&lt;t,\,R_{s+1}=i}(r_{j,s+1}-\mathbf X_s^{T}\beta)^2+\lambda\lVert\beta\rVert_2^2\right]\\[6pt]\widehat r_{j,t+1}^{(i)}&amp;=\mathbf X_t^{T}\widehat{\beta}_{i,j}\end{aligned}\]</div>
 <div class="method-v2-description">• \(\mathbf X_t\): 거시요인, \(\widehat\beta_{i,j}\): 국면·자산별 회귀계수, \(\lambda\): 정규화 강도</div>
 </div>
-<div class="method-v2-equation method-v2-model-card"><div class="method-v2-formula-label">Black–Litterman — 장기 평균(Prior)과 국면 기반 View의 결합</div>
+<div class="method-v2-equation method-v2-model-card">
+<div class="method-v2-formula-label">Black–Litterman — 장기 평균(Prior)과 국면 기반 View의 결합</div>
 <div class="method-v2-math">\[\begin{aligned}
       \pi_j &amp;=\operatorname{mean}\{r_{j,s}:s\le t\} \\[4pt]
       q_j &amp;=\sum_{i=0}^{K}\widetilde p_{i,t+1}\widehat r_{j}^{(i)} \\[4pt]
       c &amp;=\max_i\widetilde p_{i,t+1},\qquad \Omega=\frac{1-c}{c}\operatorname{diag}(\tau\widehat\Sigma_t) \\[6pt]
       \widehat\mu_{t+1}^{BL} &amp;=\left[(\tau\widehat\Sigma_t)^{-1}+\Omega^{-1}\right]^{-1}
-      \left[(\tau\widehat\Sigma_t)^{-1}\boldsymbol\pi+\Omega^{-1}\mathbf q\right]
+      \left[(\tau\widehat\Sigma_t)^{-1}\pmb\pi+\Omega^{-1}\mathbf q\right]
     \end{aligned}\]</div>
-<div class="method-v2-description">• \(\boldsymbol\pi\): 자산별 장기 평균, \(\mathbf q\): 국면확률 가중 View, \(c\): 최대 국면확률, \(\Omega\): View 불확실성, \(\tau\): Prior 공분산 조정계수</div>
+<div class="method-v2-description">• \(\pmb\pi\): 자산별 장기 평균, \(\mathbf q\): 국면확률 가중 View, \(c\): 최대 국면확률, \(\Omega\): View 불확실성, \(\tau\): Prior 공분산 조정계수</div>
 </div>
 <div class="method-v2-sub">기대수익률·위험의 결합과 투자비중 결정</div>
-<div class="method-v2-equation"><div class="method-v2-formula-label">Naive·Ridge: 예상 국면확률로 가중한 다음 월 기대수익률</div>
+<div class="method-v2-equation">
+<div class="method-v2-formula-label">Naive·Ridge: 예상 국면확률로 가중한 다음 월 기대수익률</div>
 <div class="method-v2-math">\[\widehat\mu_{j,t+1}=\sum_{i=0}^{K}\widetilde p_{i,t+1}\widehat r_{j,t+1}^{(i)}\]</div>
 <div class="method-v2-description">Black–Litterman에서는 위의 국면확률 기반 View를 장기 평균과 결합한 사후 기대수익률 사용</div>
 </div>
-<div class="method-v2-equation"><div class="method-v2-formula-label">과거 자산수익률의 표본 공분산</div>
+<div class="method-v2-equation">
+<div class="method-v2-formula-label">과거 자산수익률의 표본 공분산</div>
 <div class="method-v2-math">\[\widehat\Sigma_t=\frac{1}{n-1}\sum_{s&lt;t}(\mathbf r_s-\bar{\mathbf r})(\mathbf r_s-\bar{\mathbf r})^{T}\]</div>
 <div class="method-v2-description">투자비중 산출 시점까지 관측된 자산수익률을 이용한 위험 추정</div>
 </div>
-<div class="method-v2-equation"><div class="method-v2-formula-label">평균–분산 최적화</div>
-<div class="method-v2-math">\[\widehat{\mathbf w}_{t+1}=\arg\max_{\mathbf w}\left[\mathbf w^{T}\widehat{\boldsymbol\mu}_{t+1}-\frac{\gamma}{2}\mathbf w^{T}\widehat\Sigma_t\mathbf w\right]\]</div>
+<div class="method-v2-equation">
+<div class="method-v2-formula-label">평균–분산 최적화</div>
+<div class="method-v2-math">\[\widehat{\mathbf w}_{t+1}=\arg\max_{\mathbf w}\left[\mathbf w^{T}\widehat{\pmb\mu}_{t+1}-\frac{\gamma}{2}\mathbf w^{T}\widehat\Sigma_t\mathbf w\right]\]</div>
 <div class="method-v2-description">\(\mathbf w\): 자산별 투자비중, \(\gamma\): 위험회피계수; 세부 투자제약은 다음 절 참조</div>
 </div>
-</section><section class="method-v2-section" id="method-constraints">
-<div class="method-v2-section-head"><div class="method-v2-number">04</div><div><h3 class="method-v2-title">Portfolio Constraints</h3><p class="method-v2-kicker">SAA 기준비중 · 자산군별 허용범위 · 실증 포트폴리오 구성</p></div></div>
+</section>
+<section class="method-v2-section" id="method-constraints">
+<div class="method-v2-section-head">
+<div class="method-v2-number">04</div>
+<div>
+<h3 class="method-v2-title">Portfolio Constraints</h3>
+<p class="method-v2-kicker">SAA 기준비중 · 자산군별 허용범위 · 실증 포트폴리오 구성</p>
+</div>
+</div>
 <ul class="method-v2-bullets">
 <li>전략적 자산배분(SAA)을 기준으로 자산군별 허용범위 내에서 투자비중을 조정하는 <strong>benchmark-relative TAA</strong> 적용</li>
 <li>Long-only 및 완전투자 제약 적용; 제약·무제약 포트폴리오 성과 비교</li>
 </ul>
-<div class="method-v2-equation"><div class="method-v2-formula-label">자산군별 배분 제약을 고려한 평균–분산 최적화</div>
+<div class="method-v2-equation">
+<div class="method-v2-formula-label">자산군별 배분 제약을 고려한 평균–분산 최적화</div>
 <div class="method-v2-math">\[\begin{aligned}
-      \widehat{\mathbf w}_{t+1}&amp;=\arg\max_{\mathbf w}\left(\mathbf w^{T}\widehat{\boldsymbol\mu}_{t+1}-\frac{\gamma}{2}\mathbf w^{T}\widehat\Sigma_t\mathbf w\right)\\[4pt]
+      \widehat{\mathbf w}_{t+1}&amp;=\arg\max_{\mathbf w}\left(\mathbf w^{T}\widehat{\pmb\mu}_{t+1}-\frac{\gamma}{2}\mathbf w^{T}\widehat\Sigma_t\mathbf w\right)\\[4pt]
       \text{s.t.}\quad w_{j,t+1}&amp;\ge 0,\qquad\sum_j w_{j,t+1}=1,\\
       L_g&amp;\le\sum_{j\in g}w_{j,t+1}\le U_g
     \end{aligned}\]</div>
 <div class="method-v2-description">\(L_g,U_g\): 자산군 \(g\)의 SAA 기준 허용 하한·상한</div>
 </div>
 <div class="method-v2-sub">주신보기금 SAA 기준비중 및 자산군별 허용범위</div>
-<div class="method-v2-table-wrap"><table class="method-v2-table"><thead><tr><th>자산군</th><th>2026 기준(%)</th><th>2030 기준(%)</th><th>허용범위(%p)</th></tr></thead><tbody>
-<tr><td>현금성(MMF)</td><td>0.7</td><td>0.4</td><td>±0.3</td></tr>
-<tr><td>예금</td><td>17.7</td><td>16.9</td><td>±2.1</td></tr>
-<tr><td>국내채권</td><td>61.0</td><td>57.8</td><td>±9.1</td></tr>
-<tr><td>국내주식</td><td>7.2</td><td>8.5</td><td>±3.0</td></tr>
-<tr><td>해외채권</td><td>2.6</td><td>3.0</td><td>±0.5</td></tr>
-<tr><td>해외주식</td><td>10.8</td><td>13.4</td><td>±8.5</td></tr>
-</tbody></table></div>
+<div class="method-v2-table-wrap">
+<table class="method-v2-table">
+<thead>
+<tr>
+<th>자산군</th>
+<th>2026 기준(%)</th>
+<th>2030 기준(%)</th>
+<th>허용범위(%p)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>현금성(MMF)</td>
+<td>0.7</td>
+<td>0.4</td>
+<td>±0.3</td>
+</tr>
+<tr>
+<td>예금</td>
+<td>17.7</td>
+<td>16.9</td>
+<td>±2.1</td>
+</tr>
+<tr>
+<td>국내채권</td>
+<td>61.0</td>
+<td>57.8</td>
+<td>±9.1</td>
+</tr>
+<tr>
+<td>국내주식</td>
+<td>7.2</td>
+<td>8.5</td>
+<td>±3.0</td>
+</tr>
+<tr>
+<td>해외채권</td>
+<td>2.6</td>
+<td>3.0</td>
+<td>±0.5</td>
+</tr>
+<tr>
+<td>해외주식</td>
+<td>10.8</td>
+<td>13.4</td>
+<td>±8.5</td>
+</tr>
+</tbody>
+</table>
+</div>
 <ul class="method-v2-bullets compact">
 <li>실증분석에서는 현금성·예금 합산 비중 <strong>20% 고정</strong>, 나머지 80%를 국내·해외 주식 및 채권에 배분(SAA 기준표와 구분되는 단순화 가정)</li>
 <li>개별 지수별 최적화 및 자산군 내 동일비중 구성에 대해 제약·무제약의 <strong>4개 배분 방식</strong> 비교</li>
 <li>수익률 평가자료: 연기금투자풀의 자산군별 실현수익률</li>
 </ul>
-</section><section class="method-v2-section" id="method-performance">
-<div class="method-v2-section-head"><div class="method-v2-number">05</div><div><h3 class="method-v2-title">Performance Evaluation</h3><p class="method-v2-kicker">월별 실현수익률 · 누적수익률 · Sharpe · Maximum Drawdown</p></div></div>
+</section>
+<section class="method-v2-section" id="method-performance">
+<div class="method-v2-section-head">
+<div class="method-v2-number">05</div>
+<div>
+<h3 class="method-v2-title">Performance Evaluation</h3>
+<p class="method-v2-kicker">월별 실현수익률 · 누적수익률 · Sharpe · Maximum Drawdown</p>
+</div>
+</div>
 <ul class="method-v2-bullets">
 <li>TAA 포트폴리오의 수익성과 손실위험을 주신보기금 <strong>2026·2030 SAA</strong> 벤치마크와 비교</li>
 <li>월별 수익률을 기준으로 누적수익률·연율화 Sharpe·최대낙폭(MDD) 산출</li>
 </ul>
-<div class="method-v2-equation"><div class="method-v2-formula-label">월별 실현수익률</div>
+<div class="method-v2-equation">
+<div class="method-v2-formula-label">월별 실현수익률</div>
 <div class="method-v2-math">\[R_{p,t}=\sum_{j=1}^{J}w_{j,t}r_{j,t}=\mathbf w_t^{T}\mathbf r_t\]</div>
 <div class="method-v2-description">\(w_{j,t}\): \(t\)월 적용 투자비중, \(r_{j,t}\): \(t\)월 실현수익률</div>
 </div>
-<div class="method-v2-equation"><div class="method-v2-formula-label">누적수익률</div>
+<div class="method-v2-equation">
+<div class="method-v2-formula-label">누적수익률</div>
 <div class="method-v2-math">\[V_0=1,\qquad V_t=V_{t-1}(1+R_{p,t}),\qquad CR_T=V_T-1\]</div>
 <div class="method-v2-description">\(V_t\): 누적 포트폴리오 가치, \(CR_T\): 평가기간 누적수익률</div>
 </div>
-<div class="method-v2-equation"><div class="method-v2-formula-label">연율화 Sharpe Ratio (월별 수익률 기준)</div>
+<div class="method-v2-equation">
+<div class="method-v2-formula-label">연율화 Sharpe Ratio (월별 수익률 기준)</div>
 <div class="method-v2-math">\[SR_{\mathrm{annual}}=\sqrt{12}\frac{\overline R_p}{s(R_p)}\]</div>
 <div class="method-v2-description">무위험수익률 미차감; \(s(R_p)\)는 월별 수익률의 표본표준편차</div>
 </div>
-<div class="method-v2-equation"><div class="method-v2-formula-label">Drawdown 및 Maximum Drawdown</div>
+<div class="method-v2-equation">
+<div class="method-v2-formula-label">Drawdown 및 Maximum Drawdown</div>
 <div class="method-v2-math">\[\begin{aligned}P_t&amp;=\max_{0\le u\le t}V_u,\\ DD_t&amp;=\frac{P_t-V_t}{P_t},\\ MDD&amp;=\max_{1\le t\le T}DD_t\end{aligned}\]</div>
 <div class="method-v2-description">\(P_t\): 직전 고점, \(DD_t\): 고점 대비 하락률; MDD는 최대낙폭의 크기(양수)로 정의</div>
 </div>
 <div class="method-v2-notes method-v2-note-tight">• 보조 평가항목: 벤치마크 대비 초과수익률(Excess Return), 추적오차(TE), 정보비율(IR)</div>
-</section><div class="method-v2-footer">본 대시보드는 학술 연구 및 분석 결과의 시각화를 목적으로 제작되었으며, 제공되는 정보는 투자 권유 또는 투자 자문을 의미하지 않습니다.</div></div>
+</section>
+<div class="method-v2-footer">본 대시보드는 학술 연구 및 분석 결과의 시각화를 목적으로 제작되었으며, 제공되는 정보는 투자 권유 또는 투자 자문을 의미하지 않습니다.</div>
+</div>

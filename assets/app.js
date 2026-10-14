@@ -238,13 +238,29 @@ function updateTAA(){
  const traces=state.data.taa.classes.map((c,i)=>({type:'scatter',mode:'lines',x:w.months.map(monthDate),y:w.weights.map(row=>row[i]),stackgroup:'one',name:c,line:{color:ASSET_COLORS[i],width:0.9},fillcolor:ASSET_COLORS[i]}));
  plot('taa-history',traces,{yaxis:{title:'Weight (%)',range:[0,100]}},{title:'월별 자산군 배분',height:440});
 }
+let methodologyLoad = null;
 async function updateMethodology(){
- if(state.seen.has('methodology')){if(window.MathJax?.typesetPromise)window.MathJax.typesetPromise([$('methodology-content')]).catch(console.error);return}
+ const content=$('methodology-content');
  try{
-  const r=await fetch('methodology.html');if(!r.ok)throw new Error(`methodology.html: ${r.status}`);
-  $('methodology-content').innerHTML=await r.text();state.seen.add('methodology');
-  if(window.MathJax?.typesetPromise)window.MathJax.typesetPromise([$('methodology-content')]).catch(console.error);
- }catch(e){showError(e);$('methodology-content').textContent='Methodology 파일을 불러올 수 없습니다.'}
+  // Cache a single in-flight fetch; repeated tab clicks never duplicate the fragment.
+  if(!methodologyLoad)methodologyLoad=fetch('methodology.html?v=20261014-methodology2').then(r=>{
+   if(!r.ok)throw new Error(`methodology.html: ${r.status}`);
+   return r.text();
+  });
+  if(!state.seen.has('methodology')){
+   content.innerHTML=await methodologyLoad;
+   state.seen.add('methodology');
+  }
+  // The bundled MathJax uses startup.typeset=false: explicitly typeset fetched content.
+  const mj=window.MathJax;
+  if(mj?.startup?.promise)await mj.startup.promise;
+  if(mj?.typesetPromise)await mj.typesetPromise([content]);
+  else throw new Error('MathJax가 초기화되지 않아 수식을 표시할 수 없습니다.');
+ }catch(e){
+  showError(e);
+  if(!state.seen.has('methodology'))content.textContent='Methodology 파일을 불러올 수 없습니다.';
+  methodologyLoad=null;
+ }
 }
 async function init(){
  try{

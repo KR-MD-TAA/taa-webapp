@@ -199,3 +199,44 @@ input[type="radio"], input[type="checkbox"] { accent-color: var(--accent); }
 /* Preserve the original static-page equation legibility on small screens. */
 .method-v2-math { font-size: 14px; }
 #panel-methodology .method-v2-nav a { scroll-margin-top: 15px; }
+
+/* 7. 2026 methodology report enhancements */
+/* New report methodology: bullet lists, construction flow, and compact model cards. */
+.method-v2 .method-v2-bullets {margin:12px 0 18px;padding:0;list-style:none;display:grid;gap:7px;}
+.method-v2 .method-v2-bullets li {position:relative;padding-left:17px;line-height:1.65;word-break:keep-all;overflow-wrap:break-word;}
+.method-v2 .method-v2-bullets li::before {content:"•";position:absolute;left:0;top:0;color:#68b2ff;font-weight:700;}
+.method-v2 .method-v2-bullets.compact {margin:8px 0 10px;gap:5px;}
+.method-v2 .method-v2-bullets.compact li {font-size:.94em;line-height:1.5;}
+.method-v2 .method-v2-flow-scroll {width:100%;overflow-x:auto;padding:6px 1px 14px;scrollbar-width:thin;}
+.method-v2 .method-v2-flow {display:grid;grid-template-columns:minmax(158px,1fr) 22px minmax(170px,1fr) 22px minmax(205px,1.2fr) 22px minmax(150px,.94fr);align-items:stretch;gap:8px;min-width:780px;}
+.method-v2 .method-v2-flow-cell {min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:7px;padding:17px 11px 15px;border:1px solid rgba(130,163,203,.27);border-radius:12px;background:rgba(105,143,185,.075);text-align:center;box-sizing:border-box;}
+.method-v2 .method-v2-flow-index {font-size:.69rem;letter-spacing:.08em;opacity:.68;line-height:1;}
+.method-v2 .method-v2-flow-title {font-weight:750;font-size:.98rem;line-height:1.4;}
+.method-v2 .method-v2-flow-detail {font-size:.8rem;line-height:1.48;opacity:.82;word-break:keep-all;}
+.method-v2 .method-v2-flow-arrow {font-size:23px;line-height:1;align-self:center;justify-self:center;color:#68b2ff;}
+.method-v2 .method-v2-flow-math {margin-top:auto;padding-top:8px;width:100%;border-top:1px solid rgba(130,163,203,.22);font-size:.83em;overflow-x:auto;}
+.method-v2 .method-v2-flow-math mjx-container {margin:5px 0 0!important;}
+.method-v2 .method-v2-note-tight {margin-top:6px!important;line-height:1.6;}
+.method-v2 .method-v2-equation .method-v2-math {overflow-x:auto;overflow-y:hidden;}
+.method-v2 .method-v2-model-card {margin-top:12px;margin-bottom:12px;}
+.method-v2 .method-v2-model-card .method-v2-description {line-height:1.65;}
+.method-v2 .method-v2-model-card .method-v2-description b {font-weight:700;}
+.method-v2 .method-v2-intro-tight {margin-bottom:9px!important;}
+.method-v2 .method-v2-table-wrap {overflow-x:auto;}
+
+/* Narrow screens: retain the ordered four-step process without side-scrolling. */
+@media (max-width: 700px) {
+  .method-v2 .method-v2-flow { display: grid; grid-template-columns: minmax(0,1fr); min-width: 0; gap: 6px; }
+  .method-v2 .method-v2-flow-cell { padding: 14px 12px; align-items: flex-start; text-align: left; }
+  .method-v2 .method-v2-flow-detail { font-size: .86rem; }
+  .method-v2 .method-v2-flow-arrow { transform: rotate(90deg); font-size: 20px; }
+  .method-v2 .method-v2-flow-math { padding-top: 10px; }
+  .method-v2 .method-v2-model-card { padding: 14px 12px; }
+}
+/* Let wide LaTeX scroll inside its card, not stretch the dashboard. */
+.method-v2 .method-v2-equation, .method-v2 .method-v2-flow-cell { max-width: 100%; }
+.method-v2 .method-v2-math mjx-container[display="true"],
+.method-v2 .method-v2-flow-math mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+.method-v2 .method-v2-math mjx-container[display="true"] { margin: .45em 0 !important; }
+.method-v2 .method-v2-flow-math { font-size: .82rem; }
+.method-v2 .method-v2-nav a:focus-visible { outline: 2px solid #C4B5FD; outline-offset: 2px; }
