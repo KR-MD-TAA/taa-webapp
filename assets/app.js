@@ -1,25 +1,228 @@
 'use strict';
-const base=window.APP_BASE || '/';const cache={};const regimeNames=()=>Array.from({length:5},(_,i)=>M.names[i]||'');const isoMonth=m=>m.length===7?m+'-01':m;const addMonth=(m,n)=>{let d=new Date(m.slice(0,7)+'-01T00:00:00Z');d.setUTCMonth(d.getUTCMonth()+n);return d.toISOString().slice(0,10)};const months=v=>v?.slice?.(0,7)||String(v).slice(0,7);const $=id=>document.getElementById(id);let M,active='overview';
-async function get(url){if(!cache[url])cache[url]=fetch(base+url).then(r=>{if(!r.ok)throw Error(url+': HTTP '+r.status);return r.json()});return cache[url]}
-const h=(s)=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function sel(id,opts,value){return `<select id="${id}">${opts.map(([v,l])=>`<option value="${h(v)}" ${v===value?'selected':''}>${h(l)}</option>`).join('')}</select>`}
-function filter(title,element){return `<div class="filter-item"><label>${title}</label>${element}</div>`}
-function panel(id){return `<div class="panel"><div class="plot" id="${id}"></div></div>`}
-function kpi(label,val,sub){return `<div class="kpi-card"><div class="kpi-label">${h(label)}</div><div class="kpi-value">${h(val)}</div><div class="kpi-sub">${h(sub)}</div></div>`}
-const plotJobs=new WeakMap();function plot(id,figure){const el=$(id);if(!el||!figure)return;let task=plotJobs.get(el);if(!task){task={running:false,pending:null};plotJobs.set(el,task)}task.pending=figure;if(task.running)return;task.running=true;(async()=>{while(task.pending&&el.isConnected){let f=task.pending;task.pending=null;let layout={...f.layout,autosize:true};layout.xaxis={...(layout.xaxis||{})};if(layout.xaxis.type==='category'&&f.data?.some(t=>t.type==='scatter'&&t.x?.some?.(x=>/^\d{4}-\d\d/.test(String(x)))))layout.xaxis.type='date';await Plotly.react(el,f.data||[],layout,{displaylogo:false,responsive:true,scrollZoom:false})}task.running=false})().catch(err=>{task.running=false;console.error('Plot rendering error',id,err);el.innerHTML='<div class=error>그래프 렌더링 오류: '+h(err.message)+'</div>'})}
-function plainPlot(title,x,y,extra={}){return {data:[{type:'scatter',mode:'lines',name:title,x,y,line:{color:'#a78bfa',width:2.4}}],layout:{title:{text:title,font:{size:16}},paper_bgcolor:'#0f172a',plot_bgcolor:'#0f172a',font:{color:'#e2e8f0'},margin:{l:55,r:16,t:58,b:50},height:470,xaxis:{gridcolor:'#283449'},yaxis:{gridcolor:'#283449'},hovermode:'x unified',...extra}}}
-function regimeShapes(dates,regimes,colors){let shapes=[];let start=0;for(let i=1;i<=dates.length;i++){if(i===dates.length||regimes[i]!==regimes[start]){let r=regimes[start];if(r!==null&&r!==undefined&&colors[r])shapes.push({type:'rect',xref:'x',yref:'paper',x0:isoMonth(dates[start]),x1:i<dates.length?isoMonth(dates[i]):addMonth(dates[i-1],1),y0:0,y1:1,line:{width:0},fillcolor:colors[r],opacity:.2,layer:'below'});start=i}}return shapes}
-async function start(){M=await get('json/meta.json');document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>loadTab(b.dataset.tab));await loadTab('overview')}
-async function loadTab(tab){active=tab;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));$('main').innerHTML='<div class="note">Loading…</div>';try{if(tab==='overview')await overview();if(tab==='explorer')await explorer();if(tab==='regime')await regime();if(tab==='taa')await taa();if(tab==='methodology'){let r=await fetch(base+'methodology.html');if(!r.ok)throw Error('methodology HTML '+r.status);$('main').innerHTML=await r.text();if(window.MathJax?.typesetPromise)await MathJax.typesetPromise([$ ('main')]);}}catch(err){console.error(err);$('main').innerHTML=`<div class="error">데이터를 불러올 수 없습니다: ${h(err.message)}</div>`}}
-async function overview(){const i=M.vintages.length-1;let opts=M.major.map(v=>[v,M.labels[v]||v]);$('main').innerHTML=`<div class="filterbar">${filter('주요 거시지표',sel('ov-var',opts,'GDP_real'))}${filter('TAA 전략',sel('ov-method',M.methods.map(x=>[x,x]),'Ridge'))}</div><div class="section-head"><div class="section-title">Vintage month <strong id="ov-date"></strong></div><div class="section-sub">선택 월을 끝점으로 과거 5년과 이후 약 15개월의 실제 시계열을 표시합니다. 이후 기간에는 국면 색을 표시하지 않습니다.</div></div><div class="vintage-slider-wrap"><input type="range" min="0" max="${i}" value="${i}" step="1" class="vintage-range" id="ov-vintage"><div class="years"><span>${M.vintages[0]}</span><span>${M.vintages[Math.floor(i/2)]}</span><span>${M.vintages[i]}</span></div></div><div class="overview-grid">${panel('ov-plot')}<div class="overview-side"><div class="side-card" id="ov-info"></div><div class="side-card"><h3>선택 전략 자산배분</h3><div id="ov-alloc"></div></div><div class="side-card" id="ov-perf"></div></div></div><p class="note">Overview는 Global 기준이며, 과거 Vintage 당시의 국면 이력과 12개월 Rolling 전략성과를 사용합니다.</p>`;
-const data=await Promise.all([get('json/rt_global.json'),get('json/vintage_regimes_global.json'),get('json/rolling_perf.json'),get('json/alloc.json')]);const rt=data[0],hist=data[1],perf=data[2],alloc=data[3];let cycleStore={};let seq=0;
-async function update(){let current=++seq;let vintage=M.vintages[Number($('ov-vintage').value)],v=$('ov-var').value,method=$('ov-method').value;let gi=Object.keys(M.groups).findIndex(g=>M.groups[g].includes(v));if(gi<0)return;let cycles=await get(`json/cycles/${gi}.json`);if(current!==seq||active!=='overview')return;let series=cycles[v];let start=Number(vintage.slice(0,4))-5;let finish=new Date(vintage+'-01T00:00:00Z');finish.setUTCMonth(finish.getUTCMonth()+15);let end=finish.toISOString().slice(0,7);let x=[],y=[],fx=[],fy=[];series.x.forEach((d,j)=>{if(d>=`${start}-${vintage.slice(5,7)}`&&d<=end){if(d<=vintage){x.push(d);y.push(series.y[j])}else{fx.push(d);fy.push(series.y[j])}}});if(fx.length&&x.length){fx.unshift(x.at(-1));fy.unshift(y.at(-1))}
-let vm=hist.vintages[vintage]||hist.vintages[Object.keys(hist.vintages).filter(z=>z<=vintage).at(-1)],ds=hist.dates.filter(d=>d>=`${start}-${vintage.slice(5,7)}`&&d<=vintage),regs=ds.map(d=>vm[hist.dates.indexOf(d)]);x=x.map(isoMonth);fx=fx.map(isoMonth);let f=plainPlot(M.labels[v]||v,x,y,{shapes:regimeShapes(ds,regs,M.colors),xaxis:{gridcolor:'#283449',type:'date',range:[isoMonth(`${start}-${vintage.slice(5,7)}`),isoMonth(end)]}});if(fx.length)f.data.push({type:'scatter',x:fx,y:fy,mode:'lines',name:'Later realized data',line:{color:'#94a3b8',dash:'dash',width:2}});f.layout.height=510;plot('ov-plot',f);
-$('ov-date').textContent=vintage;let rr=rt.filter(z=>z.month<=vintage).at(-1);let reg=rr?.r??0;$('ov-info').innerHTML=`<h3>Vintage &amp; regime</h3><div class="side-row"><span class="side-label">선택 Vintage</span><span class="side-value">${h(vintage)}</span></div><div class="side-row"><span class="side-label">선택 월 Regime</span><span class="side-value" style="color:${M.colors[reg]}">R${reg} · ${h(M.names[reg])}</span></div><div class="side-row"><span class="side-label">최근 3개월</span><span>수정 가능</span></div>`;
-let w=Object.entries(alloc.by_method[method]).filter(([d])=>d<=vintage).at(-1);let cols=['#636efa','#ef553b','#00cc96','#ab63fa','#ffa15a'];$('ov-alloc').innerHTML=w?`<div class="section-sub">기준 ${h(w[0])}</div>${w[1].map((z,j)=>`<div class="alloc-row"><span>${h(alloc.names[j])}</span><div class="alloc-track"><div class="alloc-fill" style="width:${Math.max(0,Math.min(100,z*100))}%;background:${cols[j]}"></div></div><span class="alloc-pct">${(z*100).toFixed(1)}%</span></div>`).join('')}`:'<p class="note">해당 월 이전 배분 결과가 없습니다.</p>';let p=perf[method][vintage];let prev=new Date(vintage+'-01T00:00:00Z');prev.setUTCMonth(prev.getUTCMonth()-11);$('ov-perf').innerHTML=`<h3>전략 성과 · 최근 1년 (Rolling 12M)</h3><div class="muted">Global / Class constrained · ${h(method)} · ${prev.toISOString().slice(0,7)} ~ ${vintage}</div><div class="performance-cols"><div><span class="kpi-label">Sharpe</span><strong>${p?p[0].toFixed(2):'N/A'}</strong></div><div><span class="kpi-label">MDD</span><strong>${p?p[1].toFixed(1)+'%':'N/A'}</strong></div><div><span class="kpi-label">Cum. return</span><strong>${p?p[2].toFixed(1)+'%':'N/A'}</strong></div></div>`;}
-['ov-vintage','ov-var','ov-method'].forEach(id=>$(id).addEventListener('input',update));await update()}
-async function explorer(){let groups=Object.keys(M.groups);let group=groups[0];$('main').innerHTML=`<div class="filterbar">${filter('그룹',sel('exp-group',groups.map(g=>[g,(M.group_names[g]||g)+' ('+g+')']),group))}<div class="filter-item grow"><label>변수</label><div id="exp-var-box"></div></div></div><div class="meta-strip" id="exp-meta"></div>${panel('exp-chart')}<div class="note">Explorer는 원본 월별 Cycle 자료를 표시합니다.</div>`;function refreshVars(){let g=$('exp-group').value; $('exp-var-box').innerHTML=sel('exp-var',M.groups[g].map(v=>[v,M.labels[v]||v]),M.groups[g].includes('GDP_real')?'GDP_real':M.groups[g][0]);$('exp-var').onchange=update;update()};async function update(){let g=$('exp-group').value,v=$('exp-var').value,idx=groups.indexOf(g);let dat=await get(`json/cycles/${idx}.json`);if(active!=='explorer')return;let s=dat[v];$('exp-meta').innerHTML=`<div><span>그룹</span><strong>${h(M.group_names[g]||g)}</strong></div><div><span>변수</span><strong>${h(v)}</strong></div>`;let f=plainPlot(M.labels[v]||v,s.x.map(isoMonth),s.y);f.layout.xaxis.type='date';f.layout.yaxis.title='Cycle';f.data.push({x:[isoMonth(s.x[0]),isoMonth(s.x.at(-1))],y:[0,0],mode:'lines',line:{color:'#94a3b8',dash:'dot'},showlegend:false,hoverinfo:'skip'});plot('exp-chart',f)}$('exp-group').onchange=refreshVars;refreshVars()}
-async function regime(){let opts=M.vintages;let choice=opts.at(-1);$('main').innerHTML=`<div class="filterbar">${filter('PCA 방식',sel('reg-mode',[['global','Global'],['grouped','Grouped']],'global'))}${filter('기준 월',sel('reg-month',opts.map(m=>[m,m]),choice))}</div><div id="reg-kpis" class="kpi-grid"></div><div class="two-col">${panel('reg-timeline')}${panel('reg-prob')}</div><div class="regime-legend">${regimeNames().map((n,i)=>`<span class="regime-key"><span class="regime-dot" style="background:${M.colors[i]}"></span>R${i} ${h(n)}</span>`).join('')}</div><div class="two-col">${panel('reg-full')}${panel('reg-switch')}</div>${panel('reg-heat')}<p class="note">Global·Grouped별 최종 매핑과 기준 월 당시 확률을 사용합니다.</p>`;
-let req=0;async function update(){let n=++req;let mode=$('reg-mode').value,month=$('reg-month').value;let [rows,fs]=await Promise.all([get(`json/rt_${mode}.json`),get(`json/regime_fig_${mode}.json`)]);if(n!==req||active!=='regime')return;let row=rows.filter(r=>r.month<=month).at(-1)||rows[0],p=row.p,pr=p.indexOf(Math.max(...p));$('reg-kpis').innerHTML=kpi('선택 월 국면',`R${row.r} · ${M.names[row.r]}`,row.month)+kpi('선택 월 최고확률',`R${pr} · ${(p[pr]*100).toFixed(1)}%`,'Matched probability')+kpi('사용 변수',row.nvars,`PCA components: ${row.ncomp}`)+kpi('분석 관측치',row.nobs,mode);let tl=structuredClone(fs.timeline);tl.layout={...tl.layout,shapes:[...(tl.layout?.shapes||[]),{type:'line',xref:'x',yref:'paper',x0:isoMonth(month),x1:isoMonth(month),y0:0,y1:1,line:{color:'#fff',width:2,dash:'dot'}}]};plot('reg-timeline',tl);plot('reg-full',fs.full);plot('reg-switch',fs.switch);plot('reg-heat',fs.heat);let f={data:[{type:'bar',x:regimeNames().map((z,i)=>'R'+i),y:p,marker:{color:M.colors}}],layout:{title:'선택 월 국면 확률',paper_bgcolor:'#0f172a',plot_bgcolor:'#0f172a',font:{color:'#e2e8f0'},height:390,margin:{l:50,r:15,t:50,b:60},yaxis:{tickformat:'.0%',range:[0,1],gridcolor:'#283449'}}};plot('reg-prob',f)}$('reg-mode').onchange=update;$('reg-month').onchange=update;await update()}
-async function taa(){let specs=[['qoq_global','Global'],['qoq_grouped','Grouped']];$('main').innerHTML=`<div class="filterbar">${filter('Regime specification',sel('taa-spec',specs,'qoq_global'))}${filter('배분 케이스',sel('taa-case',Object.entries(M.cases),'class_eq_constrained'))}${filter('전략',sel('taa-method',M.methods.map(x=>[x,x]),'Ridge'))}</div><div id="taa-kpis" class="kpi-grid kpi-grid-3"></div><div class="two-col">${panel('taa-cum')}${panel('taa-current')}</div>${panel('taa-history')}<p class="note">Position Sizing 월별 결과 CSV의 비중을 사용합니다. 성과는 현금성+예금 20%를 제외한 위험자산 80%를 재조정한 기준입니다.</p>`;const performance=await get('json/performance.json');let request=0;async function update(){let n=++request,s=$('taa-spec').value,c=$('taa-case').value,m=$('taa-method').value,slug=m==='Black-Litterman'?'black_litterman':m.toLowerCase();let d=await get(`json/taa/${s}_${c}_${slug}.json`);if(n!==request||active!=='taa')return;let p=performance[[s,c,m].join('|')];$('taa-kpis').innerHTML=kpi('Sharpe ratio',p.sharpe.toFixed(2),'월별 수익률 연율화')+kpi('Max Drawdown',(p.mdd*100).toFixed(1)+'%','백테스트 최대 낙폭')+kpi('누적수익률',(p.cum_return*100).toFixed(1)+'%','');plot('taa-cum',d.cum);plot('taa-current',d.current);plot('taa-history',d.history)}['taa-spec','taa-case','taa-method'].forEach(id=>$(id).onchange=update);await update()}
-window.addEventListener('DOMContentLoaded',()=>{if(typeof Plotly==='undefined'){$('main').innerHTML='<div class="error">Plotly 라이브러리 로드 실패: 네트워크 연결을 확인하세요.</div>';return}start().catch(err=>{$('main').innerHTML='<div class="error">'+h(err.message)+'</div>';console.error(err)})});
+/* This dashboard runs entirely in the browser. No Python, Dash, APIs, or server execution. */
+const COLORS = ['#4F83FF','#FFB020','#3DDC97','#FF5A6F','#B388FF'];
+const NAMES = ['위기','둔화','안정','금융불안','과열'];
+const PURPLE = '#8B5CF6', INK = '#F8FAFC', MUTED = '#94A3B8', GRID = '#263244';
+const ASSET_COLORS = ['#636EFA','#EF553B','#00CC96','#AB63FA','#FFA15A'];
+const MAJOR_VARS = ['GDP_real','RETAILSALE','CAPEX','IPIND','KR.MIR','GS5','EXKRUSx','SPCS20RSA','NONBORRES','OILPRICEx','CPIAUCSL','KOSPI'];
+const CASE_LABEL = {index_constrained:'지수별 최적화 · 제약',index_unconstrained:'지수별 최적화 · 무제약',class_eq_constrained:'자산군 균등 · 제약',class_eq_unconstrained:'자산군 균등 · 무제약'};
+const $ = id => document.getElementById(id);
+const clean = s => String(s ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
+const monthDate = s => String(s).slice(0,7)+'-01';
+const plusMonth = (s,offset) => {let [y,m]=String(s).slice(0,7).split('-').map(Number);let d=new Date(Date.UTC(y,m-1+offset,1));return d.toISOString().slice(0,7)};
+const nfmt = (n,places=1) => Number(n).toFixed(places);
+const labels = [0,1,2,3,4].map(i=>'R'+i);
+const state = {tab:'overview',seen:new Set(),data:null,cycleByVar:{}};
+function fillSelect(id,values,value){
+ const el=$(id),previous=el.value;
+ el.replaceChildren();
+ for(const [val,label] of values){const opt=document.createElement('option');opt.value=val;opt.textContent=label;el.add(opt)}
+ if(value!==undefined)el.value=value;else if([...el.options].some(o=>o.value===previous))el.value=previous;
+}
+function selectedRadio(name){return document.querySelector(`input[name="${name}"]:checked`)?.value}
+function plot(id,traces,layout,opts={}){
+ const container=$(id);
+ if(!container || container.closest('.tab-panel')?.hidden)return;
+ const base={
+  template:'plotly_dark',height:opts.height||380,autosize:true,
+  margin:{l:56,r:24,t:56,b:45},
+  title:{text:opts.title||'',x:0.015,xanchor:'left',font:{size:16,color:INK}},
+  paper_bgcolor:'#0F172A',plot_bgcolor:'#0F172A',
+  font:{family:'Inter, Pretendard, Noto Sans KR, sans-serif',size:12,color:INK},
+  hovermode:'x unified',hoverlabel:{bgcolor:'#111827',bordercolor:'#334155',font:{color:INK}},
+  legend:{orientation:'h',yanchor:'bottom',y:1.02,xanchor:'right',x:1,font:{size:10,color:MUTED}},
+  xaxis:{gridcolor:GRID,zeroline:false,linecolor:'#334155',tickfont:{size:10,color:MUTED}},
+  yaxis:{gridcolor:GRID,zeroline:false,linecolor:'#334155',tickfont:{size:10,color:MUTED}},
+  transition:{duration:opts.transition??175,easing:'cubic-in-out'},
+  ...layout
+ };
+ // Deep-merge the axes so chart-specific titles do not erase dark grid styling.
+ base.xaxis={gridcolor:GRID,zeroline:false,linecolor:'#334155',tickfont:{size:10,color:MUTED},...(layout.xaxis||{})};
+ base.yaxis={gridcolor:GRID,zeroline:false,linecolor:'#334155',tickfont:{size:10,color:MUTED},...(layout.yaxis||{})};
+ return Plotly.react(container,traces,base,{displaylogo:false,responsive:true,scrollZoom:false,modeBarButtonsToRemove:['lasso2d','select2d']}).catch(showError);
+}
+function showError(err){console.error('KR-MD Dashboard:',err);const el=$('error-message');el.hidden=false;el.textContent='대시보드 표시 오류: '+(err?.message||String(err))+' (브라우저 새로고침 후에도 지속되면 파일 경로와 브라우저 콘솔을 확인하세요.)'}
+function kpi(label,value,sub='',color=PURPLE){return `<div class="kpi-card"><div class="kpi-label">${clean(label)}</div><div class="kpi-value" style="color:${color}">${clean(value)}</div><div class="kpi-sub">${clean(sub)}</div></div>`}
+function sideRow(label,value,color=''){return `<div class="side-row"><span class="side-label">${clean(label)}</span><span class="side-value" ${color?`style="color:${color}"`:''}>${clean(value)}</span></div>`}
+function initControls(){
+ const D=state.data;
+ for(const id of ['ov-method','taa-method'])fillSelect(id,D.taa.methods.map(m=>[m,m]),'Ridge');
+ fillSelect('taa-case',D.taa.cases.map(c=>[c,CASE_LABEL[c]]),'class_eq_constrained');
+ fillSelect('ov-var',MAJOR_VARS.map(v=>[v,`${D.cycles.major[v]} · ${v}`]),'GDP_real');
+ fillSelect('exp-group',D.cycles.groups.map(g=>[g.id,`${g.label} (${g.id})`]),'Output and Income');
+ fillExplorerVars();
+ const rt=D.regimes.modes.global.rt.filter(r=>r.date>='2001-01');
+ const vintage=$('ov-vintage');vintage.min='0';vintage.max=String(rt.length-1);vintage.value=vintage.max;
+ const marks=$('ov-year-marks');let ix=[];
+ for(let i=0;i<rt.length;i+=60)ix.push(i);
+ if(rt.length-1-ix.at(-1)>=24)ix.push(rt.length-1);
+ marks.innerHTML=ix.map(i=>{const pct=i/(rt.length-1)*100;const offset=(9.5-19*pct/100).toFixed(4);const transform=i===0?'translateX(0)':i===rt.length-1?'translateX(-100%)':'translateX(-50%)';return `<span class="vintage-year" style="left:calc(${pct.toFixed(4)}% + ${offset}px);transform:${transform}">${rt[i].date.slice(0,4)}</span>`}).join('');
+ updateMonthLabel();fillRegimeMonths('global');
+ $('reg-legend').innerHTML=NAMES.map((n,i)=>`<div class="regime-key"><span class="regime-dot" style="background:${COLORS[i]}"></span>R${i} ${n}</div>`).join('');
+ for(const b of document.querySelectorAll('[data-tab]'))b.addEventListener('click',()=>switchTab(b.dataset.tab));
+ $('ov-var').addEventListener('change',updateOverview);
+ $('ov-method').addEventListener('change',updateOverview);
+ vintage.addEventListener('input',()=>{updateMonthLabel();updateOverview()});
+ $('exp-group').addEventListener('change',()=>{fillExplorerVars();updateExplorer()});
+ $('exp-var').addEventListener('change',updateExplorer);
+ document.querySelectorAll('input[name="reg-mode"]').forEach(n=>n.addEventListener('change',()=>{fillRegimeMonths(n.value);updateRegime()}));
+ $('reg-month').addEventListener('change',updateRegime);
+ document.querySelectorAll('input[name="taa-spec"]').forEach(n=>n.addEventListener('change',updateTAA));
+ $('taa-case').addEventListener('change',updateTAA);
+ $('taa-method').addEventListener('change',updateTAA);
+ window.addEventListener('resize',()=>{
+  for(const e of document.querySelectorAll('.tab-panel:not([hidden]) .js-plotly-plot')){if(e.data)Plotly.Plots.resize(e)}
+ });
+}
+function updateMonthLabel(){
+ const rt=state.data.regimes.modes.global.rt.filter(r=>r.date>='2001-01');const n=Number($('ov-vintage').value),pct=100*n/Math.max(1,rt.length-1);let trans='translateX(-50%)';if(pct<=3)trans='translateX(0)';if(pct>=97)trans='translateX(-100%)';
+ const s=$('ov-vintage').style;s.setProperty('--vintage-progress',pct.toFixed(3)+'%');
+ const lbl=$('ov-month-label');lbl.textContent=rt[n].date+'-01';lbl.style.left=`calc(${pct.toFixed(4)}% + ${(9.5-19*pct/100).toFixed(4)}px)`;lbl.style.transform=trans;
+}
+function switchTab(tab){
+ state.tab=tab;
+ for(const el of document.querySelectorAll('.tab-panel'))el.hidden=(el.id!=='panel-'+tab);
+ for(const b of document.querySelectorAll('[data-tab]')){const active=b.dataset.tab===tab;b.classList.toggle('tab--selected',active);b.setAttribute('aria-selected',String(active))}
+ const updater={overview:updateOverview,explorer:updateExplorer,regime:updateRegime,taa:updateTAA,methodology:updateMethodology}[tab];
+ if(updater)updater();
+}
+function rawRegimeHistory(mode,date){
+ const d=state.data.regimes.modes[mode];
+ // Select last existing information vintage <= requested month, not the current final series.
+ let v=d.vintages[0];for(const m of d.vintages){if(m<=date)v=m;else break}
+ const h=d.histories[v];return {vintage:v,dates:d.histDates,values:h};
+}
+function selectedRegime(mode,date){
+ const h=rawRegimeHistory(mode,date);for(let j=h.dates.length-1;j>=0;j--){if(h.dates[j]<=date&&h.values[j]!=null)return h.values[j]}return 0;
+}
+function monthRegimeMap(mode,date){
+ const h=rawRegimeHistory(mode,date),r={};
+ for(let j=0;j<h.dates.length;j++){if(h.dates[j]>date)break;if(h.values[j]!=null)r[h.dates[j]]=h.values[j]}
+ return r;
+}
+function getRtRow(mode,date){const rows=state.data.regimes.modes[mode].rt;let row=rows[0];for(const x of rows){if(x.date<=date)row=x;else break}return row}
+function matchedProb(mode,probs){
+ const mapping=state.data.regimes.map[mode],p=[0,0,0,0,0];let hasCrisis=false;
+ for(const [key,v] of Object.entries(probs)){const raw=Number(String(key).replace('Regime ',''));if(raw===0)hasCrisis=true;const matched=mapping[String(raw)]??raw;p[matched]+=Number(v)}
+ if(!hasCrisis){const total=p.reduce((a,b)=>a+b,0);p[0]=Math.max(0,1-total)}
+ return p;
+}
+function monthlyIndexForVar(varid){return state.cycleByVar[varid]}
+function updateOverview(){
+ const d=state.data;if(!d)return;
+ const vintages=d.regimes.modes.global.rt.filter(x=>x.date>='2001-01');
+ const requested=vintages[Number($('ov-vintage').value)].date, row=getRtRow('global',requested),cut=row.date;
+ const first=plusMonth(cut,-60),last=plusMonth(cut,15),future=plusMonth(cut,1),series=monthlyIndexForVar($('ov-var').value);
+ if(!series){showError(new Error('거시지표를 찾을 수 없음'));return}
+ const historyX=[],historyY=[],futureX=[],futureY=[];
+ for(let i=0;i<series.dates.length;i++){
+  const date=series.dates[i].slice(0,7),y=series.y[i];if(y==null||date<first||date>last)continue;
+  if(date<=cut){historyX.push(monthDate(date));historyY.push(y)}else{futureX.push(monthDate(date));futureY.push(y)}
+ }
+ if(historyX.length&&futureX.length){futureX.unshift(historyX.at(-1));futureY.unshift(historyY.at(-1))}
+ const byMonth=monthRegimeMap('global',cut),shapes=[];
+ for(let i=0;i<=60;i++){
+  const m=plusMonth(first,i),label=byMonth[m];
+  shapes.push({type:'rect',xref:'x',yref:'paper',x0:monthDate(m),x1:monthDate(plusMonth(m,1)),y0:0,y1:1,fillcolor:COLORS[label]||'#0F172A',opacity:label===undefined?0:0.34,line:{width:0},layer:'below'});
+ }
+ shapes.push({type:'rect',xref:'x',yref:'paper',x0:monthDate(future),x1:monthDate(last),y0:0,y1:1,fillcolor:'#334155',opacity:0.70,line:{width:0},layer:'below'});
+ shapes.push({type:'line',xref:'x',yref:'paper',x0:monthDate(cut),x1:monthDate(cut),y0:0,y1:1,line:{color:INK,width:2}});
+ const yy=historyY.concat(futureY);let lo=-0.04,hi=0.04;if(yy.length){lo=Math.min(lo,...yy);hi=Math.max(hi,...yy);if(lo<-.04||hi>.04){let pad=(hi-lo)*0.05;lo-=pad;hi+=pad}}
+ const name=d.cycles.major[$('ov-var').value]||$('ov-var').value;
+ plot('ov-main',[
+  {type:'scatter',mode:'lines',x:historyX,y:historyY,name:name,line:{color:PURPLE,width:2.6}},
+  {type:'scatter',mode:'lines',x:futureX,y:futureY,name:'선택 vintage 이후 실제값',line:{color:'#CBD5E1',width:2,dash:'dash'}}
+ ],{shapes,xaxis:{type:'date',range:[monthDate(first),monthDate(last)]},yaxis:{title:'Cycle',range:[lo,hi],autorange:false},annotations:[{x:monthDate(cut),y:0.04,yref:'paper',text:'Vintage '+clean(cut),showarrow:false,xanchor:'right',font:{size:10,color:INK},bgcolor:'rgba(18,24,38,.90)'}]}, {title:name+' · 5-year rolling vintage view',height:520});
+ const regime=selectedRegime('global',cut);
+ $('ov-regime').innerHTML='<h3>Vintage &amp; regime</h3>'+sideRow('선택 Vintage',cut)+sideRow('선택 월 Regime',`R${regime} · ${NAMES[regime]}`,COLORS[regime])+sideRow('최근 3개월','신규 관측치에 따라 수정 가능');
+ const method=$('ov-method').value,key=`qoq_global|class_eq_constrained|${method}`,w=d.taa.portfolios[key];
+ const valid=w.months.map((m,i)=>m<=cut?i:-1).filter(i=>i>=0),i=valid.length?valid.at(-1):-1;
+ if(i<0){$('ov-allocation').innerHTML='<div class="note">선택 시점에는 TAA 비중이 아직 없습니다.</div>'}
+ else $('ov-allocation').innerHTML=`<div class="section-sub">기준 ${clean(w.months[i])}</div>`+d.taa.classes.map((c,j)=>`<div class="alloc-row"><div class="alloc-name">${clean(c)}</div><div class="alloc-track"><div class="alloc-fill" style="width:${Math.min(100,Math.max(0,w.weights[i][j]))}%;background:${ASSET_COLORS[j]}"></div></div><div class="alloc-pct">${nfmt(w.weights[i][j])}%</div></div>`).join('');
+ const m=d.taa.vintageMetrics[requested]?.[method],early=plusMonth(requested,-11);
+ $('ov-performance').innerHTML='<h3>전략 성과 · 최근 1년 (Rolling 12M)</h3>'+
+  `<div class="performance-descriptor">${m?`Global / Class constrained · ${clean(method)} · ${early} ~ ${requested}`:'Global / Class constrained · 12개월 성과 미제공 (2005-01부터)'}</div>`+
+  `<div class="perf-cells"><div><div class="kpi-label">Sharpe</div><div class="side-value">${m?nfmt(m[0],2):'N/A'}</div></div><div><div class="kpi-label">MDD</div><div class="side-value">${m?nfmt(m[1])+'%':'N/A'}</div></div><div><div class="kpi-label">Cum. return</div><div class="side-value">${m?nfmt(m[2])+'%':'N/A'}</div></div></div>`;
+}
+function fillExplorerVars(){
+ const group=state.data.cycles.groups.find(g=>g.id===$('exp-group').value);
+ if(!group)return;
+ fillSelect('exp-var',group.vars.map(v=>[v.id,v.label]),group.vars.some(v=>v.id==='GDP_real')?'GDP_real':group.vars[0].id)
+}
+function updateExplorer(){
+ const group=state.data.cycles.groups.find(g=>g.id===$('exp-group').value),v=group.vars.find(x=>x.id===$('exp-var').value);if(!v)return;
+ const x=[],y=[];for(let i=0;i<v.y.length;i++){if(v.y[i]!=null){x.push(group.dates[i]);y.push(v.y[i])}}
+ const korean=v.metadata['Korean series name'],title=korean&&korean!=='nan'?`${v.id} · ${korean}`:state.data.cycles.major[v.id]||v.id;
+ plot('exp-chart',[{type:'scatter',mode:'lines',x,y,line:{color:PURPLE,width:2.3},name:v.id}],{shapes:[{type:'line',xref:'paper',yref:'y',x0:0,x1:1,y0:0,y1:0,line:{color:'#9CA3AF',dash:'dot'}}],yaxis:{title:'Cycle'}},{title,height:480});
+ const meta=v.metadata||{},fields=[['그룹',group.label],['Source',meta.Source||'-'],['Period',meta.Period||'-'],['Beg',meta.Beg||'-'],['End',meta.End||'-'],['Cycle',meta.Cycle||'-']];
+ $('exp-meta').innerHTML=fields.map(([k,x])=>`<div><span>${clean(k)}</span><strong>${clean(x)}</strong></div>`).join('');
+}
+function fillRegimeMonths(mode){
+ const dates=state.data.regimes.modes[mode].rt.filter(r=>r.date>='2001-01').map(r=>r.date);
+ fillSelect('reg-month',dates.map(d=>[d,d]),dates.at(-1));
+}
+function getLatestTimeline(mode,selected){
+ const d=state.data.regimes.modes[mode],last=d.vintages.at(-1),h=d.histories[last],xx=[],yy=[];
+ for(let i=0;i<h.length;i++){if(d.histDates[i]>='2001-01'&&h[i]!=null&&d.histDates[i]<=last){xx.push(monthDate(d.histDates[i]));yy.push(h[i])}}
+ const shapes=[];let begin=0;
+ for(let i=1;i<=xx.length;i++){
+  if(i===xx.length||yy[i]!==yy[begin]){
+   shapes.push({type:'rect',xref:'x',yref:'paper',x0:xx[begin],x1:i<xx.length?xx[i]:monthDate(plusMonth(xx.at(-1),1)),y0:0,y1:1,fillcolor:COLORS[yy[begin]],opacity:0.38,line:{width:0},layer:'below'});
+   begin=i;
+  }
+ }
+ if(selected)shapes.push({type:'line',xref:'x',yref:'paper',x0:monthDate(selected),x1:monthDate(selected),y0:0,y1:1,line:{color:INK,width:2}});
+ plot('reg-timeline',[{type:'scatter',mode:'lines',x:xx,y:yy,name:'최신 수정 반영 국면',line:{color:'#CBD5E1',width:1.4}}],{shapes,xaxis:{type:'date',range:['2001-01-01',monthDate(plusMonth(xx.at(-1),1))],autorange:false},yaxis:{tickvals:[0,1,2,3,4],ticktext:NAMES.map((n,i)=>`R${i} ${n}`),range:[-0.5,4.5]}},{title:'경기국면 타임라인 · 전체 기간',height:360});
+}
+function heatTrace(z,x,y,kind){
+ const isP=kind!=='character';const Z=z.map(row=>row.map(v=>isP?v*100:v));
+ return {type:'heatmap',z:Z,x,y,text:Z.map(row=>row.map(v=>nfmt(v,isP?1:2)+(isP?'%':''))),texttemplate:'%{text}',textfont:{size:11,color:'#F8FAFC'},colorscale:[[0,'#171126'],[.35,'#34205C'],[.7,'#7C3AED'],[1,'#C4B5FD']],zmin:0,zmax:isP?100:1,colorbar:{title:isP?'%':'Scaled'}};
+}
+function updateRegime(){
+ const mode=selectedRadio('reg-mode'),m=$('reg-month').value,d=state.data.regimes.modes[mode];if(!m)return;
+ const row=getRtRow(mode,m),r=selectedRegime(mode,row.date),p=matchedProb(mode,row.probs),maxi=p.indexOf(Math.max(...p));
+ $('reg-kpis').innerHTML=[kpi('선택 월 국면',`R${r} · ${NAMES[r]}`,row.date,COLORS[r]),kpi('선택 월 최고확률',`R${maxi} · ${nfmt(p[maxi]*100)}%`,'Matched probability',COLORS[maxi]),kpi('사용 변수',row.n_vars,`PCA components: ${row.n_components}`),kpi('분석 관측치',row.n_obs,mode.charAt(0).toUpperCase()+mode.slice(1))].join('');
+ getLatestTimeline(mode,row.date);
+ plot('reg-prob',[{type:'bar',x:labels,y:p.map(q=>q*100),marker:{color:COLORS},text:p.map(q=>nfmt(q*100)+'%'),textposition:'outside'}],{yaxis:{title:'Probability (%)',range:[0,Math.max(35,Math.max(...p)*125)]}},{title:'선택 월 국면 확률',height:330});
+ for(const kind of ['full','switch']){
+  const title=kind==='full'?'국면 전이확률 (자기전이 포함)':'전환 발생 조건부 전이확률';
+  plot(`reg-trans-${kind}`,[heatTrace(d.transition[kind],labels,labels,kind)],{xaxis:{title:'To regime'},yaxis:{title:'From regime',autorange:'reversed'}},{title,height:390});
+ }
+ plot('reg-heat',[heatTrace(d.heat.z,labels,d.heat.labels,'character')],{yaxis:{automargin:true}},{title:'국면별 주요 거시지표 특성',height:520});
+}
+function updateTAA(){
+ const spec=selectedRadio('taa-spec'),c=$('taa-case').value,m=$('taa-method').value,key=`${spec}|${c}|${m}`,w=state.data.taa.portfolios[key];
+ if(!w){showError(new Error('전략 데이터를 찾을 수 없습니다: '+key));return}
+ const perf=w.perf;const months=w.cumMonths.map(monthDate);
+ $('taa-kpis').innerHTML=[kpi('Sharpe ratio',nfmt(perf.sharpe,2),'월별 수익률 연율화'),kpi('Max Drawdown',nfmt(perf.mdd)+'%','백테스트 최대 낙폭','#B91C1C'),kpi('누적수익률',nfmt(perf.cum)+'%',`${w.months[0]} – ${w.months.at(-1)}`)].join('');
+ plot('taa-cum',[
+  {type:'scatter',mode:'lines',x:months,y:w.cum[0],name:m,line:{color:PURPLE,width:2.5}},
+  {type:'scatter',mode:'lines',x:months,y:w.cum[1],name:'Benchmark 2026',line:{color:'#CBD5E1',width:1.8,dash:'dot'}},
+  {type:'scatter',mode:'lines',x:months,y:w.cum[2],name:'Benchmark 2030',line:{color:'#64748B',width:1.8,dash:'dash'}}
+ ],{yaxis:{title:'Cumulative return (%)'}},{title:'누적수익률 · Position Check 최종 결과',height:420});
+ const a=w.weights.at(-1);
+ plot('taa-current',[{type:'bar',x:state.data.taa.classes,y:a,marker:{color:ASSET_COLORS},text:a.map(z=>nfmt(z)+'%'),textposition:'outside'}],{yaxis:{title:'Weight (%)',range:[0,Math.max(45,Math.max(...a)*1.25)]},xaxis:{tickangle:-18}},{title:`최근 자산배분 · ${w.months.at(-1)}`,height:390});
+ const traces=state.data.taa.classes.map((c,i)=>({type:'scatter',mode:'lines',x:w.months.map(monthDate),y:w.weights.map(row=>row[i]),stackgroup:'one',name:c,line:{color:ASSET_COLORS[i],width:0.9},fillcolor:ASSET_COLORS[i]}));
+ plot('taa-history',traces,{yaxis:{title:'Weight (%)',range:[0,100]}},{title:'월별 자산군 배분',height:440});
+}
+async function updateMethodology(){
+ if(state.seen.has('methodology')){if(window.MathJax?.typesetPromise)window.MathJax.typesetPromise([$('methodology-content')]).catch(console.error);return}
+ try{
+  const r=await fetch('methodology.html');if(!r.ok)throw new Error(`methodology.html: ${r.status}`);
+  $('methodology-content').innerHTML=await r.text();state.seen.add('methodology');
+  if(window.MathJax?.typesetPromise)window.MathJax.typesetPromise([$('methodology-content')]).catch(console.error);
+ }catch(e){showError(e);$('methodology-content').textContent='Methodology 파일을 불러올 수 없습니다.'}
+}
+async function init(){
+ try{
+  if(typeof Plotly==='undefined')throw new Error('assets/plotly.min.js를 불러오지 못했습니다.');
+  const paths=['cycles.json','regimes.json','taa.json'];
+  const resp=await Promise.all(paths.map(path=>fetch('data/'+path)));
+  for(let i=0;i<resp.length;i++)if(!resp[i].ok)throw new Error(`data/${paths[i]} (HTTP ${resp[i].status})`);
+  const [cycles,regimes,taa]=await Promise.all(resp.map(r=>r.json()));
+  state.data={cycles,regimes,taa};
+  for(const group of cycles.groups)for(const variable of group.vars){state.cycleByVar[variable.id]={dates:group.dates,y:variable.y}}
+  initControls();updateOverview();
+ }catch(e){showError(e)}
+}
+init();

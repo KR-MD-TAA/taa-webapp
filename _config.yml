@@ -1,7 +1,11 @@
+# Static Jekyll wrapper; all dashboard computations take place in the visitor's browser.
 title: KR-MD & TAA Dashboard
+description: Korean Macro Regime & Tactical Asset Allocation
 markdown: kramdown
+# Asset paths are relative to index.html, so both account and project Pages URLs work.
+# You do not need to change baseurl for https://username.github.io/REPO/.
 exclude:
   - README.md
   - Gemfile
   - Gemfile.lock
-  - .github
+  - LICENSE

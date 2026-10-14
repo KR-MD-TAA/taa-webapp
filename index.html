@@ -1,8 +1,112 @@
 ---
 layout: null
 ---
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KR-MD & TAA Dashboard</title>
-<link rel="stylesheet" href="assets/style.css"><link rel="stylesheet" href="assets/zz_pur_dark_v5_overrides.css"><link rel="stylesheet" href="assets/zz_pur_dark_v6_overrides.css"><link rel="stylesheet" href="assets/zzzz_1012_vintage_spacing.css"><link rel="stylesheet" href="assets/zzzz_1014_methodology.css"><link rel="stylesheet" href="assets/static.css">
-<link rel="stylesheet" href="assets/final-polish.css"><script defer src="assets/plotly.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>window.APP_BASE=new URL('./',document.baseURI).href;</script><script defer src="assets/app.js"></script></head>
-<body><header class="topbar"><div class="brand-wrap"><div class="brand-mark">KR-MD</div><div><h1 class="title">Korean Macro Regime & Tactical Asset Allocation</h1><p class="subtitle">Monthly MD · Regime identification · Tactical asset allocation</p></div></div><div class="researchers"><small>RESEARCHERS</small><div>Beomseok Seo (<a href="https://seo-beomseok.github.io" target="_blank" rel="noopener">seo-beomseok.github.io</a>)</div><div>Seoyeon Lee (<a href="https://github.com/amy1058-bit" target="_blank" rel="noopener">github.com/amy1058-bit</a>)</div></div></header>
-<nav class="tabs" id="tabs"><button data-tab="overview" class="active">Overview</button><button data-tab="explorer">KR-MD Explorer</button><button data-tab="regime">Regime Analysis</button><button data-tab="taa">TAA</button><button data-tab="methodology">Methodology</button></nav><main id="main" class="content"><div class="note">대시보드 데이터를 읽고 있습니다…</div></main><footer class="footer">Research dashboard · Not investment advice</footer><script>window.addEventListener('load',()=>{setTimeout(()=>{const el=document.getElementById('main');if(el&&el.textContent.includes('대시보드 데이터를 읽고 있습니다'))el.innerHTML='<div class="error">대시보드 스크립트를 실행하지 못했습니다. GitHub Pages에서 배포된 주소로 열고 개발자 도구의 Console 및 Network 오류를 확인하세요.</div>';},8000)});</script></body></html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="KR-MD &amp; TAA — Korean Macro Regime & Tactical Asset Allocation research dashboard">
+  <meta name="theme-color" content="#081120">
+  <title>KR-MD &amp; TAA Dashboard</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/zz_pur_dark_v5_overrides.css">
+  <link rel="stylesheet" href="assets/zz_pur_dark_v6_overrides.css">
+  <link rel="stylesheet" href="assets/zzzz_1012_vintage_spacing.css">
+  <link rel="stylesheet" href="assets/zzzz_1014_methodology.css">
+  <link rel="stylesheet" href="assets/static.css">
+  <script>window.MathJax = { tex: {inlineMath: [['\\(', '\\)']],displayMath: [['\\[', '\\]']]}, svg: {fontCache: 'global'}, startup: {typeset: false} };</script>
+  <script src="assets/tex-svg.js" defer></script>
+  <script src="assets/plotly.min.js" defer></script>
+  <script src="assets/app.js" defer></script>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand-wrap"><div class="brand-mark">KR-MD</div><div>
+      <h1 class="title">Korean Macro Regime &amp; Tactical Asset Allocation</h1>
+      <p class="subtitle">Monthly MD · Regime identification · Tactical asset allocation</p>
+    </div></div>
+    <div class="researchers">
+      <div class="research-heading">RESEARCHERS</div>
+      <div>Beomseok Seo (<a href="https://seo-beomseok.github.io" target="_blank" rel="noopener noreferrer">seo-beomseok.github.io</a>)</div>
+      <div>Seoyeon Lee (<a href="https://github.com/amy1058-bit" target="_blank" rel="noopener noreferrer">github.com/amy1058-bit</a>)</div>
+    </div>
+  </header>
+  <nav class="tabs" role="tablist" aria-label="Dashboard tabs">
+    <button class="tab tab--selected" role="tab" aria-selected="true" aria-controls="panel-overview" data-tab="overview">Overview</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="panel-explorer" data-tab="explorer">KR-MD Explorer</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="panel-regime" data-tab="regime">Regime Analysis</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="panel-taa" data-tab="taa">TAA</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="panel-methodology" data-tab="methodology">Methodology</button>
+  </nav>
+  <main class="content">
+    <div id="error-message" class="error-message" hidden role="alert"></div>
+    <section id="panel-overview" class="tab-panel" role="tabpanel">
+      <div class="filterbar overview-filterbar">
+        <div class="filter-item overview-indicator"><label for="ov-var">주요 거시지표</label><div class="dropdown-wrap"><select id="ov-var" class="dark-dropdown"></select><span class="dropdown-caret" aria-hidden="true">▾</span></div></div>
+        <div class="filter-item"><label for="ov-method">TAA 전략</label><div class="dropdown-wrap"><select id="ov-method" class="dark-dropdown"></select><span class="dropdown-caret" aria-hidden="true">▾</span></div></div>
+      </div>
+      <div class="section-head"><div><div class="section-title">Vintage month</div><div class="section-sub">드래그하면 1개월 단위로 이동합니다. 선택 월을 끝점으로 5년 rolling window가 움직이며 오른쪽 약 20%는 Regime 색상 없이 실제 시계열만 표시합니다.</div></div></div>
+      <div class="vintage-slider-wrap">
+        <input id="ov-vintage" class="vintage-range" type="range" min="0" max="1" step="1" value="1" aria-label="Vintage month">
+        <div id="ov-month-label" class="vintage-handle-date"></div>
+        <div id="ov-year-marks" class="vintage-year-marks"></div>
+      </div>
+      <div class="overview-grid">
+        <div class="panel"><div id="ov-main" class="plot"></div></div>
+        <div class="overview-side">
+          <div id="ov-regime" class="side-card"></div>
+          <div class="side-card"><h3>선택 전략 자산배분</h3><div id="ov-allocation"></div></div>
+          <div id="ov-performance" class="side-card"></div>
+        </div>
+      </div>
+      <div class="note bottom-note">Overview는 Global 기준입니다. 선택한 Vintage까지 추정된 Regime 이력을 사용하며 최근 3개월은 신규 관측치에 따라 수정될 수 있습니다. 오른쪽 회색 영역은 Regime 예측이 아닙니다.</div>
+    </section>
+    <section id="panel-explorer" class="tab-panel" role="tabpanel" hidden>
+      <div class="filterbar">
+        <div class="filter-item"><label for="exp-group">그룹</label><div class="dropdown-wrap"><select id="exp-group" class="dark-dropdown"></select><span class="dropdown-caret" aria-hidden="true">▾</span></div></div>
+        <div class="filter-item grow"><label for="exp-var">변수</label><div class="dropdown-wrap"><select id="exp-var" class="dark-dropdown"></select><span class="dropdown-caret" aria-hidden="true">▾</span></div></div>
+      </div>
+      <div id="exp-meta" class="meta-strip"></div>
+      <div class="panel"><div id="exp-chart" class="plot"></div></div>
+      <div class="note bottom-note">Explorer는 df_cycle.pkl에서 변환한 월별 순환변동치(Cycle)를 표시합니다.</div>
+    </section>
+    <section id="panel-regime" class="tab-panel" role="tabpanel" hidden>
+      <div class="filterbar">
+        <div class="filter-item"><label>PCA 방식</label><div class="radio-group"><label><input type="radio" name="reg-mode" value="global" checked> Global</label><label><input type="radio" name="reg-mode" value="grouped"> Grouped</label></div></div>
+        <div class="filter-item"><label for="reg-month">기준 월</label><div class="dropdown-wrap"><select id="reg-month" class="dark-dropdown"></select><span class="dropdown-caret" aria-hidden="true">▾</span></div></div>
+      </div>
+      <div id="reg-kpis" class="kpi-grid"></div>
+      <div class="two-col">
+        <div class="panel"><div id="reg-timeline" class="plot"></div></div>
+        <div class="panel"><div id="reg-prob" class="plot"></div></div>
+      </div>
+      <div id="reg-legend" class="regime-legend"></div>
+      <div class="two-col">
+        <div class="panel"><div id="reg-trans-full" class="plot"></div></div>
+        <div class="panel"><div id="reg-trans-switch" class="plot"></div></div>
+      </div>
+      <div class="panel"><div id="reg-heat" class="plot"></div></div>
+      <div class="note bottom-note">Global·Grouped별 최종 매핑을 사용합니다. 타임라인은 최신 Vintage 기준의 전체 국면 이력이며, 기준 월은 세로선으로 표시합니다. 기준 월의 확률은 해당 시점에 저장된 값입니다.</div>
+    </section>
+    <section id="panel-taa" class="tab-panel" role="tabpanel" hidden>
+      <div class="filterbar">
+        <div class="filter-item"><label>Regime specification</label><div class="radio-group"><label><input type="radio" name="taa-spec" value="qoq_global" checked> Global</label><label><input type="radio" name="taa-spec" value="qoq_grouped"> Grouped</label></div></div>
+        <div class="filter-item grow"><label for="taa-case">배분 케이스</label><div class="dropdown-wrap"><select id="taa-case" class="dark-dropdown"></select><span class="dropdown-caret" aria-hidden="true">▾</span></div></div>
+        <div class="filter-item"><label for="taa-method">전략</label><div class="dropdown-wrap"><select id="taa-method" class="dark-dropdown"></select><span class="dropdown-caret" aria-hidden="true">▾</span></div></div>
+      </div>
+      <div id="taa-kpis" class="kpi-grid kpi-grid-3"></div>
+      <div class="two-col">
+        <div class="panel"><div id="taa-cum" class="plot"></div></div>
+        <div class="panel"><div id="taa-current" class="plot"></div></div>
+      </div>
+      <div class="panel"><div id="taa-history" class="plot"></div></div>
+      <div class="note bottom-note">Position Sizing 월별 결과 CSV의 γ=5 비중을 사용합니다. 성과는 현금성+예금 20%를 제외한 위험자산 80%를 100%로 재조정한 기준입니다.</div>
+    </section>
+    <section id="panel-methodology" class="tab-panel" role="tabpanel" hidden><div id="methodology-content" aria-live="polite"></div></section>
+  </main>
+  <footer class="footer">Research dashboard · Not investment advice</footer>
+</div>
+</body>
+</html>

@@ -1,38 +1,64 @@
 # KR-MD & TAA Dashboard — Jekyll / GitHub Pages
 
-This is a self-contained **static** port of the uploaded October 14, 2026 Dash dashboard. It uses **Jekyll for site generation** and JavaScript + Plotly for interaction. The deployed website does not run Python or Dash. Python was used once to transform source datasets and calculated Plotly figures into JSON.
+This project is a **static, browser-only port** of the supplied `1014_DASHBOARD_PUR_Dark_v8_rolling1y` Dash notebook. **No Python or Dash server is needed to host or run it.**
 
-## GitHub Pages deployment
+## Pages and functionality
 
-1. Create a GitHub repository (a new empty repository is fine).
-2. Upload the **contents of this ZIP to the repository root**, including the hidden `.github/workflows/pages.yml` file. Do not upload the ZIP itself or place everything in another nested folder.
-3. Go to **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-4. Commit on the `main` branch. Select the successful **Deploy Jekyll dashboard to GitHub Pages** workflow under Actions.
-5. Visit the URL shown on the Pages deployment. Project pages (`username.github.io/repository/`) and user pages (`username.github.io/`) are both supported through Jekyll's `relative_url` filter.
+- **Overview** — 5-year rolling vintage plot, revision-aware economic regime backgrounds, future observations in a gray zone, synchronized monthly slider, allocation bars, and precomputed trailing-12-month Sharpe / MDD / cumulative return.
+- **KR-MD Explorer** — 13 macro groups and all variables from the original `df_cycle.pkl` plus variable metadata.
+- **Regime Analysis** — Global or Grouped PCA, economic-label alignment, full-history timeline, vintage probability bars, transition matrices, and regime-characteristic heatmap.
+- **TAA** — Global/Grouped, all four sizing cases and Naive / Ridge / Black–Litterman methods; historical cumulative return vs. the two SAA benchmarks, current and historical asset allocation, performance KPIs.
+- **Methodology** — 5 sections of the supplied notebook, including equations and tables, rendered with MathJax.
 
-All four interactive analysis tabs work in the browser using local JSON files; the Methodology tab renders the original math and tables using MathJax. Plotly and MathJax are loaded from public CDNs and require network access. The saved charts and rolling 12-month performance are taken from the submitted source data (not recomputed in a GitHub-hosted Python environment).
+## Deploy on GitHub Pages (Actions)
 
-### Local preview
+1. Create an empty GitHub repository and **upload all files in this folder to the repository root**. Keep the `.github/workflows/pages.yml` file and the `data` and `assets` folders. Do not upload the enclosing folder as a single directory.
+2. Ensure the default branch is `main` and push.
+3. Under repository **Settings → Pages → Build and deployment**, set **Source = GitHub Actions**.
+4. Under **Actions**, check the deployment workflow. The published site should be `https://<USER>.github.io/<REPOSITORY>/`.
+
+For a new repository from a terminal:
 
 ```bash
-bundle install
-bundle exec jekyll serve
+git init
+git add .
+git commit -m "Add static KR-MD TAA Jekyll dashboard"
+git branch -M main
+git remote add origin https://github.com/USERNAME/REPOSITORY.git
+git push -u origin main
 ```
 
-Open the local URL printed by Jekyll. Do not double-click `index.html`: its Liquid paths require a Jekyll build. **No Python is needed** for preview or deployment.
+**You do not need to edit `_config.yml` for repository subpaths.** Every resource uses a path relative to the main `index.html` file, which works at `/` and at `/REPOSITORY/`.
 
-### Troubleshooting
+## Preview locally
 
-- If the Action fails in `bundle install`, review the GitHub workflow log for network or dependency errors.
-- If the action succeeds but the site is empty, check Pages **Source: GitHub Actions** and that all `json/` files exist on GitHub.
-- If graphs remain blank but the rest of the page works, check your browser's developer console and CDN connectivity (Plotly).
-- The original `.ipynb`, Python dependencies, and binary pickles were intentionally excluded. Only runtime-required static data and assets were retained.
+Opening the HTML with `file://` in a browser can block local JSON requests due to browser security restrictions. Use the VS Code **Live Server** extension, a local static web server, or GitHub Pages to preview. The actual dashboard never invokes Python.
 
+## Layout
 
-## Build issue fixed (2026-10-14)
-- Removed `.nojekyll`; no longer mixes Jekyll Liquid placeholders with disabled Jekyll processing.
-- Asset and JSON links are relative, so both `https://USER.github.io/REPO/` and a custom domain work.
-- Bundled Plotly locally to avoid external CDN failures.
-- The workflow installs Jekyll explicitly (no missing `Gemfile` or Bundler dependency).
-- In **Settings → Pages**, select **GitHub Actions** and upload the *contents* of this folder to your repository root.
-- **Do not** open `index.html` directly as `file://`; its JSON files require serving over HTTP(S).
+```text
+index.html                Jekyll site entry point (with front matter)
+_config.yml               Jekyll configuration
+.github/workflows/pages.yml
+assets/app.js             Interactive, browser-only Dash callback replacement
+assets/static.css         Native web control styling
+assets/*.css              Original PUR Dark styles
+assets/plotly.min.js      Locally bundled Plotly (no CDN required)
+assets/tex-svg.js         Locally bundled MathJax (no CDN required)
+data/cycles.json          Converted df_cycle.pkl plus mapping metadata
+data/regimes.json         Vintage histories, probabilities, matrices and heatmaps
+data/taa.json             Original allocation series and evaluated performance
+methodology.html          Original 5 methodology sections and equations
+```
+
+These JSON files are a **snapshot of the provided final data**, pre-exported during conversion. Adding future data requires updating the corresponding JSON; there is no server-side computation on a visitor's browser. TAA optimization and PCA / clustering are not re-estimated: their supplied final results are displayed as in the source dashboard.
+
+## Data checks / methodological details
+
+- Each Overview monthly regime history is read from the **vintage-specific** column of `revised_regimes`, not from the latest final series. The selected month is the last historical month with a regime background, and the future shaded region is independent of regime prediction.
+- Global and Grouped raw-to-final mapping is applied separately.
+- For the original four-class membership probabilities, missing crisis probability is recovered as `1 - sum(R1..R4)` without renormalization.
+- TAA cumulative returns come from `monthly_returns_comparison.csv` (percentage units), and KPI metrics come from `performance_comparison.csv`; Overview trailing-12-month performance comes from `performance_vintage_1y_wide.csv`.
+- Portfolio allocation charts use the supplied weight CSVs and the source dashboard's cash assumption of 20%.
+
+Not investment advice.
