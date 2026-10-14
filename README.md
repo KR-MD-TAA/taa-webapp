@@ -1,4 +1,6 @@
-# KR-MD & TAA Dashboard — Jekyll / GitHub Pages Edition
+# KR-MD & TAA Dashboard
+
+https://KR-MD-TAA.github.io/taa-webapp
 
 한국형 거시경제 데이터(KR-MD)를 활용한 거시경제 국면 식별과 전술적 자산배분(TAA) 결과를 탐색하는 **정적 웹 대시보드**입니다. 
 
