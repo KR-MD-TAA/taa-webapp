@@ -24,14 +24,17 @@ html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--in
 body { font-family: Inter, Pretendard, "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 14px; }
 [hidden] { display: none !important; }
 button, select, input { font: inherit; }
-.topbar { min-height: 86px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; border-bottom: 1px solid var(--line); background: var(--topbar); }
-.brand-wrap { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.topbar { min-height: 86px; display: flex; align-items: center; justify-content: space-between; gap: 26px; padding: 0 32px; border-bottom: 1px solid var(--line); background: var(--topbar); }
+.brand-wrap { display: flex; align-items: center; gap: 16px; min-width: 0; flex: 1 1 auto; }
 .brand-mark { font-weight: 800; color: #fff; background: var(--accent); padding: 9px 12px; border-radius: 5px; flex: 0 0 auto; }
 .title { font-size: 22px; line-height: 1.2; margin: 0; font-weight: 750; letter-spacing: -.025em; color: var(--ink); }
 .subtitle { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
-.researchers { text-align: right; font-size: 12px; line-height: 1.65; color: #F1F5F9; flex-shrink: 0; margin-left: 28px; }
+/* Right-hand institution block; edit names in index.html (.organization-list). */
+.organizations { color: #F1F5F9; font-size: 12px; line-height: 1.65; text-align: right; flex: 0 0 auto; overflow-wrap: break-word; }
+.organization-list > div { white-space: nowrap; }
+.researchers { text-align: right; font-size: 12px; line-height: 1.65; color: #F1F5F9; flex-shrink: 0; margin-left: 0; }
 .researchers a { color: #C4B5FD; text-decoration: underline; text-underline-offset: 3px; }
-.research-heading { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #A78BFA; margin-bottom: 5px; }
+.research-heading, .organization-heading { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #A78BFA; margin-bottom: 5px; }
 .tabs { display: flex; gap: 0; padding: 0 30px; border-bottom: 1px solid var(--line); background: var(--topbar); overflow-x: auto; scrollbar-width: thin; }
 .tabs .tab { white-space: nowrap; flex: 0 0 auto; cursor: pointer; font-size: 13px; padding: 15px 18px; border: 0; border-bottom: 3px solid transparent; background: var(--topbar); color: var(--muted); font-weight: 650; }
 .tabs .tab:hover { color: #E9E2FF; }
@@ -121,6 +124,10 @@ input[type="radio"], input[type="checkbox"] { accent-color: var(--accent); }
 
 /* 5. Small screen layouts */
 @media (max-width: 1100px) {
+  .topbar { flex-wrap: wrap; gap: 10px 26px; padding-top: 12px; padding-bottom: 12px; }
+  .brand-wrap { flex: 1 1 100%; }
+  .organizations { text-align: left; margin-left: 64px; }
+  .researchers { text-align: left; }
   .overview-grid, .two-col { grid-template-columns: 1fr; }
   .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -136,7 +143,7 @@ input[type="radio"], input[type="checkbox"] { accent-color: var(--accent); }
 }
 @media (max-width: 730px) {
   .topbar { align-items: flex-start; flex-wrap: wrap; gap: 8px; }
-  .researchers { text-align: left; margin: 0 0 0 64px; }
+  .researchers { text-align: left; margin: 0; }
   .overview-grid, .two-col { grid-template-columns: minmax(0, 1fr); }
   .content { padding-top: 14px; }
 }
@@ -154,7 +161,7 @@ input[type="radio"], input[type="checkbox"] { accent-color: var(--accent); }
   .title { font-size: 16px; }
   .brand-wrap { gap: 10px; }
   .brand-mark { font-size: 12px; padding: 8px; }
-  .researchers { margin-left: 0; }
+  .organizations, .researchers { flex: 1 1 100%; margin-left: 0; }
   .kpi-value { font-size: 20px; }
   .side-row { gap: 7px; }
   .alloc-row { grid-template-columns: 85px minmax(70px, 1fr) 43px; }
